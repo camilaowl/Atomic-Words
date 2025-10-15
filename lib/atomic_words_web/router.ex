@@ -17,7 +17,16 @@ defmodule AtomicWordsWeb.Router do
   scope "/", AtomicWordsWeb do
     pipe_through :browser
 
+    get "/onboarding", AuthController, :onboarding
+    get "/login", AuthController, :login
+    get "/sign_up", AuthController, :sign_up
+    post "/logout", AuthController, :logout
     get "/", PageController, :home
+    get "/words", WordsController, :index
+    get "/word_details", WordsController, :word_details
+    get "/practice", WordsController, :practice
+    get "/stats", StatsController, :stats
+    get "/settings", SettingsController, :settings
   end
 
   # Other scopes may use custom stacks.
