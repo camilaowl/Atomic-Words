@@ -15,7 +15,8 @@ defmodule AtomicWords.Application do
       # Start a worker by calling: AtomicWords.Worker.start_link(arg)
       # {AtomicWords.Worker, arg},
       # Start to serve requests, typically the last entry
-      AtomicWordsWeb.Endpoint
+      AtomicWordsWeb.Endpoint,
+      {Goth, name: AtomicWords}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

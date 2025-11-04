@@ -3,8 +3,6 @@ defmodule AtomicWordsWeb.HomeLive do
 
   import AtomicWordsWeb.CoreComponents
 
-  #alias AtomicWordsWeb.Router.Helpers, as: Routes
-
   def render(assigns) do
     ~H"""
       <div class="flex flex-row justify-left p-5">
@@ -25,6 +23,10 @@ defmodule AtomicWordsWeb.HomeLive do
               </form>
             </div>
 
+            <h3 id="translation-result" class="mt-5" style="margin-top: 20px;">
+              {@translation_result}
+            </h3>
+
           </div>
 
           <div id="words-list" class="mt-5" style="margin-top: 20px;" >
@@ -36,9 +38,17 @@ defmodule AtomicWordsWeb.HomeLive do
     """
   end
 
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+
+  def mount(%{"search" => word}, _session, socket) do
+    translation_result =
+      case AtomicWords.Translator.translate(word, "uk") do
+        {:ok, translated_text} -> translated_text
+        {:error, _reason} -> "Translation error"
+      end
+    {:ok, assign(socket, translation_result: translation_result)}
   end
+
+  def mount(_params, _session, socket), do: mount(%{"search" => ""}, _session, socket)
 
   def handle_event("go_to_settings", _value, socket) do
     {:noreply, push_navigate(socket, to: "/settings")}
