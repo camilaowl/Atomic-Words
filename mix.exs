@@ -5,7 +5,7 @@ defmodule AtomicWords.MixProject do
     [
       app: :atomic_words,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19.3",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),

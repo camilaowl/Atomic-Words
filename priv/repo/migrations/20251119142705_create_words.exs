@@ -4,7 +4,7 @@ defmodule AtomicWords.Repo.Migrations.CreateWords do
   def change do
     create table(:words) do
       add :text, :string
-      add :transcription, :string
+      add :transcription, :text
       add :use_case, :string
 
       timestamps(type: :utc_datetime)

@@ -29,10 +29,48 @@ defmodule AtomicWords.Translator do
           end
   end
 
-  defp read_file(path) do
-    File.read(path)
+  def read_file(path) do
+    File.open(path, [:read], fn file ->
+      IO.read(file, :all)
+      |> String.split("\n", trim: true)
+    end)
   end
 
+  def add_word(word) do
+    #{:ok, translation} = translate(word, "uk")
+    AtomicWords.Repo.insert(%AtomicWords.Word{text: word})
+  end
 
+  def setup_words_from_file(path) do
+    {:ok, words} = read_file(path)
+    words
+    |> Enum.uniq()
+    |> Enum.each(&add_word/1)
+  end
+
+  def read_transcriptions_from_file(path) do
+    File.open(path, [:read], fn file ->
+      IO.read(file, :all)
+      |> String.split("\n", trim: true)
+      |> Enum.map(fn line ->
+        [word, transcription] = String.split(line, "\t")
+        {word, transcription}
+      end)
+    end)
+  end
+
+  def setup_translations() do
+    words = AtomicWords.Repo.all(AtomicWords.Word)
+
+    Enum.each(words, fn word ->
+      case translate(word.text, "uk") do
+        {:ok, translation} ->
+          {:ok, changeset} = AtomicWords.Repo.insert(%AtomicWords.Translation{text: translation, lang: "uk"})
+          AtomicWords.Repo.insert(%AtomicWords.WordTranslation{word_id: word.id, translation_id: changeset.id})
+        {:error, reason} ->
+          IO.puts("Failed to translate #{word.text}: #{inspect(reason)}")
+      end
+    end)
+  end
 
 end

@@ -61,7 +61,7 @@ config :logger, :default_formatter,
 config :phoenix, :json_library, Jason
 
 # Configure Goth for Google Cloud authentication
-config :goth, json: "config/atomicwords-14ea7f3b8367.json" |> File.read!()
+config :goth, json: "config/atomicwords-92914dc1a721.json" |> File.read!()
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -5,7 +5,6 @@ defmodule AtomicWords.Repo.Migrations.CreateTranslations do
     create table(:translations) do
       add :text, :string
       add :lang, :string
-      add :word_id, :integer
 
       timestamps(type: :utc_datetime)
     end
