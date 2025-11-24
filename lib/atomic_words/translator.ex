@@ -1,5 +1,7 @@
 defmodule AtomicWords.Translator do
 
+  import Ecto.Query
+
   @moduledoc """
   Handles translation of words using Google Translate API.
   """
@@ -41,6 +43,13 @@ defmodule AtomicWords.Translator do
     AtomicWords.Repo.insert(%AtomicWords.Word{text: word})
   end
 
+  @spec setup_words_from_file(
+          binary()
+          | maybe_improper_list(
+              binary() | maybe_improper_list(any(), binary() | []) | char(),
+              binary() | []
+            )
+        ) :: :ok
   def setup_words_from_file(path) do
     {:ok, words} = read_file(path)
     words
@@ -59,18 +68,8 @@ defmodule AtomicWords.Translator do
     end)
   end
 
-  def setup_translations() do
-    words = AtomicWords.Repo.all(AtomicWords.Word)
-
-    Enum.each(words, fn word ->
-      case translate(word.text, "uk") do
-        {:ok, translation} ->
-          {:ok, changeset} = AtomicWords.Repo.insert(%AtomicWords.Translation{text: translation, lang: "uk"})
-          AtomicWords.Repo.insert(%AtomicWords.WordTranslation{word_id: word.id, translation_id: changeset.id})
-        {:error, reason} ->
-          IO.puts("Failed to translate #{word.text}: #{inspect(reason)}")
-      end
-    end)
+  def test_migrations() do
+    AtomicWords.Repo.all(from w in AtomicWords.Word, where: w.lang == "uk")
   end
 
 end

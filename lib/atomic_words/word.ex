@@ -6,6 +6,7 @@ defmodule AtomicWords.Word do
     field :text, :string
     field :transcription, :string
     field :use_case, :string
+    field :lang, :string, default: "en"
 
     timestamps(type: :utc_datetime)
   end
@@ -13,7 +14,7 @@ defmodule AtomicWords.Word do
   @doc false
   def changeset(word, attrs) do
     word
-    |> cast(attrs, [:text, :transcription, :use_case])
-    |> validate_required([:text, :transcription, :use_case])
+    |> cast(attrs, [:text, :transcription, :use_case, :lang])
+    |> validate_required([:text, :transcription, :use_case, :lang])
   end
 end
