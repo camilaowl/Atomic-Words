@@ -7,6 +7,7 @@ defmodule AtomicWords.Translator do
   """
   alias GoogleApi.Translate.V2.Connection
   alias GoogleApi.Translate.V2.Api.Translations
+  alias AtomicWords.Schema.Word
 
   def translate(text, target_lang \\ "uk") do
     with {:ok, token} <- Goth.fetch(AtomicWords),
@@ -40,7 +41,7 @@ defmodule AtomicWords.Translator do
 
   def add_word(word) do
     #{:ok, translation} = translate(word, "uk")
-    AtomicWords.Repo.insert(%AtomicWords.Word{text: word})
+    Repo.insert(%Word{text: word})
   end
 
   @spec setup_words_from_file(
@@ -69,7 +70,7 @@ defmodule AtomicWords.Translator do
   end
 
   def test_migrations() do
-    AtomicWords.Repo.all(from w in AtomicWords.Word, where: w.lang == "uk")
+    Repo.all(from w in Word, where: w.lang == "uk")
   end
 
 end

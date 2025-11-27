@@ -2,42 +2,53 @@ defmodule AtomicWordsWeb.HomeLive do
   use Phoenix.LiveView
 
   import AtomicWordsWeb.CoreComponents
+  alias AtomicWords.Words
 
   def render(assigns) do
     ~H"""
-      <div class="flex flex-row justify-left p-5">
-        <div id="menu" class="mb-5" (style="margin-bottom: 20px;")>
+    <div class="flex flex-row justify-left p-5">
+      <div id="menu" class="mb-5">
+        <ul>
+          <li><button class="button" phx-click="go_to_settings">Go to Settings</button></li>
+          <li><button class="button" phx-click="go_to_stats">Go to Stats</button></li>
+          <li><button class="button" phx-click="words">Words</button></li>
+        </ul>
+      </div>
+
+      <div class="flex-col justify-center" style="margin-left: 100px;">
+        <div class="flex-row" style="position: relative;">
+          <div id="form" class="mt-5" style="margin-bottom: 20px; position: relative;">
+            <form class="add_word_form" style="display: flex; align-items: center;">
+              <input
+                class="add_word_input"
+                type="text"
+                id="search"
+                name="search"
+                placeholder="Type to search words..."
+              />
+              <.icon name="hero-magnifying-glass" class="icon" />
+            </form>
+          </div>
+
+          <h3 id="translation-result" class="mt-5" style="margin-top: 20px;">
+            {@translation_result}
+          </h3>
+        </div>
+
+        <div id="words-list" class="mt-5" style="margin-top: 20px;">
+          <h1>Words List</h1>
           <ul>
-            <li><button class="button" phx-click="go_to_settings">Go to Settings</button></li>
-            <li><button class="button" phx-click="go_to_stats">Go to Stats</button></li>
-            <li><button class="button" phx-click="words">Words</button></li>
+            <%= for word <- @last_added do %>
+              <section>
+                <li>{word.text} ({word.lang})</li>
+              </section>
+            <% end %>
           </ul>
         </div>
-
-        <div class="flex-col justify-center" style="margin-left: 100px;">
-          <div class="flex-row" style="position: relative;">
-            <div id="form" class="mt-5" style="margin-bottom: 20px; position: relative;">
-              <form class="add_word_form" style="display: flex; align-items: center;">
-                <input class="add_word_input" type="text" id="search" name="search" placeholder="Type to search words..."/>
-                <.icon name="hero-magnifying-glass" class="icon"/>
-              </form>
-            </div>
-
-            <h3 id="translation-result" class="mt-5" style="margin-top: 20px;">
-              {@translation_result}
-            </h3>
-
-          </div>
-
-          <div id="words-list" class="mt-5" style="margin-top: 20px;" >
-            <h1>Words List</h1>
-          </div>
-        </div>
+      </div>
     </div>
-
     """
   end
-
 
   def mount(%{"search" => word}, _session, socket) do
     translation_result =
@@ -45,7 +56,15 @@ defmodule AtomicWordsWeb.HomeLive do
         {:ok, translated_text} -> translated_text
         {:error, _reason} -> "Translation error"
       end
-    {:ok, assign(socket, translation_result: translation_result)}
+
+    last_added = Words.last_added_words()
+
+    socket =
+      socket
+      |> assign(:translation_result, translation_result)
+      |> assign(:last_added, last_added)
+
+    {:ok, socket}
   end
 
   def mount(_params, _session, socket), do: mount(%{"search" => ""}, _session, socket)
