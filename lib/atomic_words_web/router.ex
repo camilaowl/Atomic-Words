@@ -21,7 +21,7 @@ defmodule AtomicWordsWeb.Router do
     get "/login", AuthController, :login
     get "/sign_up", AuthController, :sign_up
     post "/logout", AuthController, :logout
-    #get "/", PageController, :home
+    # get "/", PageController, :home
     live "/", HomeLive
     get "/words", WordsController, :index
     get "/word_details", WordsController, :word_details

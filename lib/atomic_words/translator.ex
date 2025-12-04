@@ -1,5 +1,4 @@
 defmodule AtomicWords.Translator do
-
   import Ecto.Query
 
   @moduledoc """
@@ -13,23 +12,23 @@ defmodule AtomicWords.Translator do
     with {:ok, token} <- Goth.fetch(AtomicWords),
          conn <- Connection.new(token.token),
          {:ok, response} <- Translations.language_translations_list(conn, text, target_lang) do
-            response.translations
-            |> List.first()
-            |> Map.get(:translatedText)
-            |> then(&{:ok, &1})
-          else
-            error -> {:error, error}
-          end
+      response.translations
+      |> List.first()
+      |> Map.get(:translatedText)
+      |> then(&{:ok, &1})
+    else
+      error -> {:error, error}
+    end
   end
 
   def test(text, target_lang \\ "uk") do
     with {:ok, token} <- Goth.fetch(AtomicWords),
          conn <- Connection.new(token.token),
          {:ok, response} <- Translations.language_translations_list(conn, text, target_lang) do
-            response
-          else
-            error -> {:error, error}
-          end
+      response
+    else
+      error -> {:error, error}
+    end
   end
 
   def read_file(path) do
@@ -40,7 +39,7 @@ defmodule AtomicWords.Translator do
   end
 
   def add_word(word) do
-    #{:ok, translation} = translate(word, "uk")
+    # {:ok, translation} = translate(word, "uk")
     Repo.insert(%Word{text: word})
   end
 
@@ -53,6 +52,7 @@ defmodule AtomicWords.Translator do
         ) :: :ok
   def setup_words_from_file(path) do
     {:ok, words} = read_file(path)
+
     words
     |> Enum.uniq()
     |> Enum.each(&add_word/1)
@@ -72,5 +72,4 @@ defmodule AtomicWords.Translator do
   def test_migrations() do
     Repo.all(from w in Word, where: w.lang == "uk")
   end
-
 end

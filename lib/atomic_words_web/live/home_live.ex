@@ -1,7 +1,7 @@
 defmodule AtomicWordsWeb.HomeLive do
-  use Phoenix.LiveView
+  use AtomicWordsWeb, :live_view
 
-  import AtomicWordsWeb.CoreComponents
+  # import AtomicWordsWeb.CoreComponents
   alias AtomicWords.Words
 
   def render(assigns) do
@@ -9,6 +9,9 @@ defmodule AtomicWordsWeb.HomeLive do
     <div class="flex flex-row justify-left p-5">
       <div id="menu" class="mb-5">
         <ul>
+          <.link navigate={~p"/settings"}>
+            Go to Settings
+          </.link>
           <li><button class="button" phx-click="go_to_settings">Go to Settings</button></li>
           <li><button class="button" phx-click="go_to_stats">Go to Stats</button></li>
           <li><button class="button" phx-click="words">Words</button></li>
@@ -16,27 +19,14 @@ defmodule AtomicWordsWeb.HomeLive do
       </div>
 
       <div class="flex-col justify-center" style="margin-left: 100px;">
-        <div class="flex-row" style="position: relative;">
-          <div id="form" class="mt-5" style="margin-bottom: 20px; position: relative;">
-            <form class="add_word_form" style="display: flex; align-items: center;">
-              <input
-                class="add_word_input"
-                type="text"
-                id="search"
-                name="search"
-                placeholder="Type to search words..."
-              />
-              <.icon name="hero-magnifying-glass" class="icon" />
-            </form>
-          </div>
-
-          <h3 id="translation-result" class="mt-5" style="margin-top: 20px;">
-            {@translation_result}
-          </h3>
-        </div>
+        <.live_component
+          module={AtomicWordsWeb.LiveComponents.SearchComponent}
+          id="search"
+          translation_result={@translation_result}
+        />
 
         <div id="words-list" class="mt-5" style="margin-top: 20px;">
-          <h1>Words List</h1>
+          <h1>The last 30 added:</h1>
           <ul>
             <%= for word <- @last_added do %>
               <section>
@@ -67,7 +57,7 @@ defmodule AtomicWordsWeb.HomeLive do
     {:ok, socket}
   end
 
-  def mount(_params, _session, socket), do: mount(%{"search" => ""}, _session, socket)
+  def mount(_params, session, socket), do: mount(%{"search" => ""}, session, socket)
 
   def handle_event("go_to_settings", _value, socket) do
     {:noreply, push_navigate(socket, to: "/settings")}

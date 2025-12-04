@@ -1,5 +1,5 @@
 defmodule AtomicWordsWeb.WordsHTML do
-    use AtomicWordsWeb, :html
+  use AtomicWordsWeb, :html
 
-    embed_templates "words_html/*"
+  embed_templates "words_html/*"
 end
