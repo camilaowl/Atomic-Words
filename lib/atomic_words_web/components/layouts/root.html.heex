@@ -29,8 +29,8 @@
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
-    <section class="container background-white dark:background-gray-900 mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold text-center my-8">Atomic Words Home</h1>
+    <section class="w-full flex justify-end p-4">
+      <.theme_toggle class="w-32 p-4 place-self-end" />
     </section>
   </head>
   <body>

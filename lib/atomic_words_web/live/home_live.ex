@@ -6,8 +6,8 @@ defmodule AtomicWordsWeb.HomeLive do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-row justify-left p-5">
-      <div id="menu" class="mb-5">
+    <div class="flex flex-row justify-center w-full">
+      <div id="menu" class="flex flex-col w-1/4">
         <ul>
           <.link navigate={~p"/settings"}>
             Go to Settings
@@ -18,7 +18,7 @@ defmodule AtomicWordsWeb.HomeLive do
         </ul>
       </div>
 
-      <div class="flex-col justify-center" style="margin-left: 100px;">
+      <div class="flex-col justify-center w-1/2">
         <.live_component
           module={AtomicWordsWeb.LiveComponents.SearchComponent}
           id="search"
@@ -36,6 +36,7 @@ defmodule AtomicWordsWeb.HomeLive do
           </ul>
         </div>
       </div>
+      <div id="spacer" class="w-1/4" />
     </div>
     """
   end

@@ -31,6 +31,10 @@ defmodule AtomicWords.Words do
     Repo.all(query)
   end
 
+  def add_user_word(user_id, word_id) do
+    Repo.insert(%UserWords{user_id: user_id, word_id: word_id})
+  end
+
   def delete_user_word_by_id(word_id) do
     query =
       from uw in UserWords,
