@@ -59,11 +59,16 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   end
 
   def mount(socket) do
+    added_word_ids =
+      Words.find_user_words_by_user_id(1)
+      |> Enum.map(fn uw -> uw.word_id end)
+      |> MapSet.new()
+
     socket =
       socket
       |> assign(:search_query, "")
       |> assign(:search_results, [])
-      |> assign(:added_word_ids, MapSet.new())
+      |> assign(:added_word_ids, added_word_ids)
 
     {:ok, socket}
   end

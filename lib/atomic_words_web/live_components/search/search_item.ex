@@ -16,14 +16,14 @@ defmodule SearchItem do
         {@rest}
         phx-value-id={@item.id}
         class={[
-          "flex items-center justify-center w-10 h-10 rounded-full transition-colors",
-          (@added && "bg-green-600") || "bg-grey-400 hover:bg-green-700"
+          "p-2 rounded-full transition-colors flex items-center justify-center",
+          (@added && "bg-green-600") || "bg-gray-400 hover:bg-gray-600"
         ]}
       >
         <%= if @added do %>
-          <.icon name="hero-check-circle" class="w-6 h-6 text-white" />
+          <.icon name="hero-check" class="w-5 h-5 text-white" />
         <% else %>
-          <.icon name="hero-plus-circle" class="w-6 h-6 text-white" />
+          <.icon name="hero-plus" class="w-5 h-5 text-white" />
         <% end %>
       </button>
     </div>
