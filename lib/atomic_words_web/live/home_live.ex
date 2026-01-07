@@ -26,8 +26,8 @@ defmodule AtomicWordsWeb.HomeLive do
         />
 
         <div id="words-list" class="mt-5" style="margin-top: 20px;">
-          <h1>The last 30 added:</h1>
-          <ul>
+          <h1>The last added:</h1>
+          <ul class="pt-4">
             <%= for word <- @last_added do %>
               <section>
                 <li>{word.text} ({word.lang})</li>
@@ -48,7 +48,7 @@ defmodule AtomicWordsWeb.HomeLive do
         {:error, _reason} -> "Translation error"
       end
 
-    last_added = Words.last_added_words()
+    last_added = Words.last_added_user_words(1, 30)
 
     socket =
       socket

@@ -44,7 +44,16 @@ defmodule AtomicWords.Words do
     Repo.delete_all(query)
   end
 
-  def last_added_words() do
-    Repo.all(from w in Word, limit: 30)
+  def last_added_user_words(user_id, limit) do
+    query =
+      from uw in UserWords,
+        join: w in Word,
+        on: uw.word_id == w.id,
+        where: uw.user_id == ^user_id,
+        order_by: [desc: uw.inserted_at],
+        limit: ^limit,
+        select: w
+
+    Repo.all(query)
   end
 end
