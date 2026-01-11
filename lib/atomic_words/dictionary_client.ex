@@ -22,6 +22,6 @@ defmodule AtomicWords.DictionaryClient do
   end
 
   defp handle_response({:ok, %Finch.Response{status: 200, body: body}}), do: {:found, body}
-  defp handle_response({:ok, %Finch.Response{status: 404}}), do: {:not_found, nil}
+  defp handle_response({:ok, %Finch.Response{status: 404}}), do: {:not_found, []}
   defp handle_response(_), do: {:error, :request_failed}
 end

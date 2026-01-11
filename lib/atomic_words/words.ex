@@ -21,18 +21,21 @@ defmodule AtomicWords.Words do
       {:found, _body} ->
         input
         |> Translator.translate(original_lang)
+        |> IO.inspect(label: "translation result")
+        |> dbg()
         |> case do
           {:ok, translated_text} ->
             add_translated_word(input, translated_text, original_lang, target_lang)
             Repo.all(search_partial_query(input))
 
           _ ->
-            nil
+            []
         end
 
       _ ->
-        nil
+        []
     end
+    |> IO.inspect(label: "fetch_and_add_word result")
   end
 
   defp search_partial_query(input) do
