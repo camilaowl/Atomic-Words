@@ -16,7 +16,8 @@ defmodule AtomicWords.Application do
       # {AtomicWords.Worker, arg},
       # Start to serve requests, typically the last entry
       AtomicWordsWeb.Endpoint,
-      {Goth, name: AtomicWords}
+      {Goth, name: AtomicWords},
+      {Finch, name: AtomicWords.Finch}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

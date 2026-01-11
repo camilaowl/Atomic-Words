@@ -92,7 +92,9 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   def handle_event("change", %{"search" => search_query}, socket) do
     if String.length(search_query) > 2 do
-      search_results = Words.search_partial(search_query)
+      search_results =
+        Words.search_partial(search_query, socket.assigns.origin_lang, socket.assigns.target_lang)
+
       socket = assign(socket, :search_results, search_results)
       {:noreply, socket}
     else

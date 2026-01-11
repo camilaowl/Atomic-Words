@@ -67,7 +67,8 @@ defmodule AtomicWords.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
       {:google_api_translate, "~> 0.22.0"},
-      {:goth, "~> 1.3"}
+      {:goth, "~> 1.3"},
+      {:finch, "~> 0.18"}
     ]
   end
 

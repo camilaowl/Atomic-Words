@@ -4,18 +4,52 @@ defmodule AtomicWords.Words do
   alias AtomicWords.Schema.Word
   alias AtomicWords.Schema.WordTranslation
   alias AtomicWords.Schema.UserWords
+  alias AtomicWords.Translator
+  alias AtomicWords.DictionaryClient
 
-  def search_partial(input) do
-    query =
-      from w in Word,
-        where: ilike(w.text, ^"%#{input}%"),
-        select: w
+  def search_partial(input, original_lang, target_lang) do
+    query = search_partial_query(input)
 
-    Repo.all(query)
+    case Repo.all(query) do
+      [] -> fetch_and_add_word(input, original_lang, target_lang)
+      results -> results
+    end
+  end
+
+  def fetch_and_add_word(input, original_lang, target_lang) do
+    case DictionaryClient.valid_word(input) do
+      {:found, _body} ->
+        input
+        |> Translator.translate(original_lang)
+        |> case do
+          {:ok, translated_text} ->
+            add_translated_word(input, translated_text, original_lang, target_lang)
+            Repo.all(search_partial_query(input))
+
+          _ ->
+            nil
+        end
+
+      _ ->
+        nil
+    end
+  end
+
+  defp search_partial_query(input) do
+    from w in Word,
+      where: ilike(w.text, ^"%#{input}%"),
+      select: w
   end
 
   def add_word(word, lang) do
     Repo.insert(%Word{text: word, lang: lang})
+  end
+
+  def add_translated_word(original_word, translated_word, original_lang, translated_lang) do
+    {:ok, original} = Repo.insert(%Word{text: original_word, lang: original_lang})
+    {:ok, translated} = Repo.insert(%Word{text: translated_word, lang: translated_lang})
+    bind_words(original.id, translated.id)
+    {:ok, original, translated}
   end
 
   def bind_words(word_id, translation_id) do
