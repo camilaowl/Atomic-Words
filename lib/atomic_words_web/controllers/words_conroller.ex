@@ -1,7 +1,7 @@
 defmodule AtomicWordsWeb.WordsController do
   use AtomicWordsWeb, :controller
 
-  def index(conn, _params) do
-    render(conn, "index.html")
+  def home(conn, _params) do
+    render(conn, :words)
   end
 end

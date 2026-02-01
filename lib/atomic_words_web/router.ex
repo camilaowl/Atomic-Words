@@ -25,8 +25,7 @@ defmodule AtomicWordsWeb.Router do
     get "/sign_up", AuthController, :sign_up
     post "/logout", AuthController, :logout
     # get "/", PageController, :home
-    live "/", HomeLive
-    get "/words", WordsController, :index
+    # get "/words", WordsController, :index
     get "/word_details", WordsController, :word_details
     get "/practice", WordsController, :practice
     get "/stats", StatsController, :stats
@@ -64,6 +63,8 @@ defmodule AtomicWordsWeb.Router do
       on_mount: [{AtomicWordsWeb.UserAuth, :require_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/", HomeLive
+      live "/words", WordsLive
     end
 
     post "/users/update-password", UserSessionController, :update_password

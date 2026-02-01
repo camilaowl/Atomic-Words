@@ -6,71 +6,7 @@ defmodule AtomicWordsWeb.Layouts do
   use AtomicWordsWeb, :html
 
   # Embed all files in layouts/* within this module.
-  # The default root.html.heex file contains the HTML
-  # skeleton of your application, namely HTML headers
-  # and other static content.
   embed_templates "layouts/*"
-
-  @doc """
-  Renders your app layout.
-
-  This function is typically invoked from every template,
-  and it often contains your application menu, sidebar,
-  or similar.
-
-  ## Examples
-
-      <Layouts.app flash={@flash}>
-        <h1>Content</h1>
-      </Layouts.app>
-
-  """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
-
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
-
-  slot :inner_block, required: true
-
-  def app(assigns) do
-    ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
-      <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
-      </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </header>
-
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
-      </div>
-    </main>
-
-    <.flash_group flash={@flash} />
-    """
-  end
 
   @doc """
   Shows the flash group with standard titles and content.
@@ -148,6 +84,56 @@ defmodule AtomicWordsWeb.Layouts do
       >
         <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
       </button>
+    </div>
+    """
+  end
+
+  attr :current_user, :any
+  attr :active_tab, :atom, default: :home
+
+  def sidebar_nav_links(assigns) do
+    ~H"""
+    <div class="space-y-1">
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :home, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        navigate={~p"/"}
+      >
+        <.icon name="hero-home" class="size-4 inline-block mr-2" /> Home
+      </.link>
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :settings, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        navigate={~p"/users/settings"}
+      >
+        <.icon name="hero-cog-6-tooth" class="size-4 inline-block mr-2" /> Settings
+      </.link>
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :stats, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        navigate={~p"/stats"}
+      >
+        <.icon name="hero-chart-bar" class="size-4 inline-block mr-2" /> Statistics
+      </.link>
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :words, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        navigate={~p"/words"}
+      >
+        <.icon name="hero-book-open" class="size-4 inline-block mr-2" /> Words
+      </.link>
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :logout, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        href={~p"/users/log-out"}
+      >
+        <.icon name="hero-arrow-left-start-on-rectangle" class="size-4 inline-block mr-2" /> Log out
+      </.link>
     </div>
     """
   end
