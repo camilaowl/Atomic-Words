@@ -1,7 +1,7 @@
 defmodule AtomicWordsWeb.StatsController do
   use AtomicWordsWeb, :controller
 
-  def stats(conn, _params) do
-    render(conn, "stats.html")
+  def home(conn, _params) do
+    render(conn, :statistics)
   end
 end

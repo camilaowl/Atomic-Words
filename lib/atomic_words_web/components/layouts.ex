@@ -112,9 +112,9 @@ defmodule AtomicWordsWeb.Layouts do
       </.link>
       <.link
         class={
-            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :stats, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :statistics, do: "bg-gray-200", else: "hover:bg-gray-50"}"
           }
-        navigate={~p"/stats"}
+        navigate={~p"/statistics"}
       >
         <.icon name="hero-chart-bar" class="size-4 inline-block mr-2" /> Statistics
       </.link>

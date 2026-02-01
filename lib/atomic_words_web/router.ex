@@ -21,15 +21,9 @@ defmodule AtomicWordsWeb.Router do
     pipe_through :browser
 
     get "/onboarding", AuthController, :onboarding
-    get "/login", AuthController, :login
-    get "/sign_up", AuthController, :sign_up
-    post "/logout", AuthController, :logout
-    # get "/", PageController, :home
-    # get "/words", WordsController, :index
     get "/word_details", WordsController, :word_details
     get "/practice", WordsController, :practice
-    get "/stats", StatsController, :stats
-    get "/settings", SettingsController, :settings
+    get "/users/log-out", UserSessionController, :delete
   end
 
   # Other scopes may use custom stacks.
@@ -65,6 +59,8 @@ defmodule AtomicWordsWeb.Router do
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/", HomeLive
       live "/words", WordsLive
+      live "/stats", StatisticsLive
+      live "/statistics", StatisticsLive
     end
 
     post "/users/update-password", UserSessionController, :update_password
