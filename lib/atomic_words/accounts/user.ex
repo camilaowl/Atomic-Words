@@ -57,6 +57,23 @@ defmodule AtomicWords.Accounts.User do
   end
 
   @doc """
+  A changeset for creating a user via Google OAuth.
+  """
+  def google_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :google_uid, :confirmed_at])
+    |> validate_required([:email, :google_uid])
+    |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
+      message: "must have the @ sign and no spaces"
+    )
+    |> validate_length(:email, max: 160)
+    |> unsafe_validate_unique(:email, AtomicWords.Repo)
+    |> unique_constraint(:email)
+    |> unsafe_validate_unique(:google_uid, AtomicWords.Repo)
+    |> unique_constraint(:google_uid)
+  end
+
+  @doc """
   A user changeset for changing the password.
 
   It is important to validate the length of the password, as long passwords may

@@ -24,6 +24,8 @@ defmodule AtomicWordsWeb.Router do
     get "/word_details", WordsController, :word_details
     get "/practice", WordsController, :practice
     get "/users/log-out", UserSessionController, :delete
+    get "/auth/google", GoogleAuthController, :index
+    get "/auth/google/callback", GoogleAuthController, :index
   end
 
   # Other scopes may use custom stacks.

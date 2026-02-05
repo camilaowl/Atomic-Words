@@ -281,6 +281,27 @@ defmodule AtomicWords.Accounts do
     :ok
   end
 
+  def get_or_create_user_from_google(profile) do
+    email = profile.email
+    google_uid = profile.sub
+
+    case Repo.get_by(User, email: email) do
+      nil ->
+        %User{}
+        # todo: add avatar and nickname fields
+        |> User.google_changeset(%{
+          email: email,
+          google_uid: google_uid,
+          confirmed_at: DateTime.utc_now(:second)
+        })
+        |> Repo.insert()
+
+      user ->
+        # todo: merge excisting user with google profile info if needed
+        {:ok, user}
+    end
+  end
+
   ## Token helper
 
   defp update_user_and_delete_all_tokens(changeset) do

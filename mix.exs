@@ -69,7 +69,8 @@ defmodule AtomicWords.MixProject do
       {:bandit, "~> 1.5"},
       {:google_api_translate, "~> 0.22.0"},
       {:goth, "~> 1.3"},
-      {:finch, "~> 0.18"}
+      {:finch, "~> 0.18"},
+      {:elixir_auth_google, "~> 1.6.9"}
     ]
   end
 
