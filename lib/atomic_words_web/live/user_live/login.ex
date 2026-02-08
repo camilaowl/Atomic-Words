@@ -8,7 +8,7 @@ defmodule AtomicWordsWeb.UserLive.Login do
     ~H"""
     <Layouts.auth flash={@flash} current_scope={@current_scope}>
       <div class="w-full h-screen bg-blue-50 items-center flex justify-center">
-        <div class="w-1/3 h-2/3 bg-white items-stretch px-12 flex flex-col justify-center rounded-2xl shadow-sm">
+        <div class="w-1/3 h-fit bg-white items-stretch p-12 flex flex-col justify-center rounded-2xl shadow-sm">
           <h1 class="text-3xl font-bold mb-6 text-center">Sign In</h1>
 
           <.form
@@ -34,7 +34,7 @@ defmodule AtomicWordsWeb.UserLive.Login do
               autocomplete="current-password"
             />
 
-            <.button class="btn btn-primary w-full">
+            <.button class="btn btn-primary w-full mt-4">
               Sign In
             </.button>
           </.form>

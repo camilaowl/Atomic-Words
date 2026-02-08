@@ -8,6 +8,7 @@ defmodule AtomicWords.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field :nickname, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -27,6 +28,12 @@ defmodule AtomicWords.Accounts.User do
     user
     |> cast(attrs, [:email])
     |> validate_email(opts)
+  end
+
+  def nickname_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:nickname])
+    |> validate_length(:nickname, max: 50)
   end
 
   defp validate_email(changeset, opts) do
@@ -51,6 +58,28 @@ defmodule AtomicWords.Accounts.User do
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
       add_error(changeset, :email, "did not change")
+    else
+      changeset
+    end
+  end
+
+  def registration_changeset(user, attrs, opts \\ [hash_password: true]) do
+    user
+    # <-- :password must be here!
+    |> cast(attrs, [:email, :nickname, :password])
+    |> validate_required([:email, :nickname, :password])
+    |> email_changeset(attrs, opts)
+    |> password_changeset(attrs, opts)
+    |> nickname_changeset(attrs)
+    |> validate_email(opts)
+
+    # |> validate_password(opts)
+    # |> put_password_hash()
+  end
+
+  defp put_password_hash(changeset) do
+    if password = get_change(changeset, :password) do
+      put_change(changeset, :hashed_password, Bcrypt.hash_pwd_salt(password))
     else
       changeset
     end

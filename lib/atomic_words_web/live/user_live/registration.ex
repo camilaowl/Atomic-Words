@@ -8,34 +8,74 @@ defmodule AtomicWordsWeb.UserLive.Registration do
   def render(assigns) do
     ~H"""
     <Layouts.auth flash={@flash} current_scope={@current_scope}>
-      <div class="mx-auto max-w-sm">
-        <div class="text-center">
-          <.header>
-            Register for an account
-            <:subtitle>
-              Already registered?
-              <.link navigate={~p"/users/log-in"} class="font-semibold text-brand hover:underline">
-                Log in
-              </.link>
-              to your account now.
-            </:subtitle>
-          </.header>
+      <div class="w-full h-screen bg-blue-50 items-center flex justify-center">
+        <div class="w-1/3 h-fit bg-white items-stretch p-12 flex flex-col justify-center rounded-2xl shadow-sm">
+          <h1 class="text-3xl font-bold mb-6 text-center">Sign Up</h1>
+
+          <.form
+            :let={f}
+            for={@form}
+            id="registration_form"
+            phx-submit="save"
+          >
+            <.input
+              readonly={!!@current_scope}
+              field={f[:nickname]}
+              type="text"
+              label="Nickname"
+              autocomplete="username"
+              required
+            />
+            <.input
+              readonly={!!@current_scope}
+              field={f[:email]}
+              type="email"
+              label="Email"
+              autocomplete="username"
+              required
+            />
+            <.input
+              field={f[:password]}
+              type="password"
+              label="Password"
+              required
+            />
+            <.input
+              field={f[:password_confirmation]}
+              type="password"
+              label="Confirm Password"
+              required
+            />
+
+            <.button class="btn btn-primary w-full mt-4">
+              Sign Up
+            </.button>
+          </.form>
+
+          <div class=""></div>
+
+          <div class="text-center mt-4">
+            <p>
+              Already have an account? <.link
+                navigate={~p"/users/log-in"}
+                class="font-semibold text-brand hover:underline"
+                phx-no-format
+              >Sign in</.link>
+            </p>
+          </div>
+
+          <div class="mt-4 flex flex-col items-center">
+            <p class="mb-2">Or</p>
+
+            <.link href={~p"/auth/google/callback"} class="inline-block">
+              <img
+                src="/images/google/light/web_light_sq_SU.svg"
+                alt="Google Logo"
+                class="size-48 size-fit"
+              />
+            </.link>
+          </div>
         </div>
-
-        <.form for={@form} id="registration_form" phx-submit="save" phx-change="validate">
-          <.input
-            field={@form[:email]}
-            type="email"
-            label="Email"
-            autocomplete="username"
-            required
-            phx-mounted={JS.focus()}
-          />
-
-          <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
-            Create an account
-          </.button>
-        </.form>
       </div>
     </Layouts.auth>
     """
@@ -50,26 +90,28 @@ defmodule AtomicWordsWeb.UserLive.Registration do
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_email(%User{}, %{}, validate_unique: false)
 
-    {:ok, assign_form(socket, changeset), temporary_assigns: [form: nil]}
+    email =
+      Phoenix.Flash.get(socket.assigns.flash, :email) ||
+        get_in(socket.assigns, [:current_scope, Access.key(:user), Access.key(:email)])
+
+    form = to_form(%{"email" => email}, as: "user")
+
+    socket =
+      socket
+      |> assign_form(changeset)
+      |> assign(form: form)
+
+    {:ok, socket, temporary_assigns: [form: nil]}
   end
 
   @impl true
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
-        {:ok, _} =
-          Accounts.deliver_login_instructions(
-            user,
-            &url(~p"/users/log-in/#{&1}")
-          )
-
         {:noreply,
          socket
-         |> put_flash(
-           :info,
-           "An email was sent to #{user.email}, please access it to confirm your account."
-         )
-         |> push_navigate(to: ~p"/users/log-in")}
+         |> put_flash(:info, "Account created successfully.")
+         |> push_navigate(to: ~p"/users/log-in?user=#{user_params}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
