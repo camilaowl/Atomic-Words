@@ -89,6 +89,28 @@ defmodule AtomicWordsWeb.Layouts do
   end
 
   attr :current_user, :any
+
+  def sidebar_profile_info(assigns) do
+    ~H"""
+    <div class="flex items-center space-x-4 pr-4 my-4">
+      <div class="avatar">
+        <div class="w-12 rounded-full">
+          <img
+                src="/images/avatar.svg"
+                alt="User Avatar"
+                class="size-12"
+              />
+        </div>
+      </div>
+      <div>
+        <p class="text-md font-medium text-gray-900">{@current_user.nickname} {@current_user.id}</p>
+        <p class="text-sm font-medium text-gray-500">{@current_user.email}</p>
+      </div>
+    </div>
+    """
+  end
+
+  attr :current_user, :any
   attr :active_tab, :atom, default: :home
 
   def sidebar_nav_links(assigns) do
