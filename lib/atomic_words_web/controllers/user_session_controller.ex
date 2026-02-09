@@ -3,6 +3,7 @@ defmodule AtomicWordsWeb.UserSessionController do
 
   alias AtomicWords.Accounts
   alias AtomicWordsWeb.UserAuth
+  alias AtomicWords.Accounts.User
 
   def create(conn, %{"_action" => "confirmed"} = params) do
     create(conn, params, "User confirmed successfully.")
@@ -10,6 +11,22 @@ defmodule AtomicWordsWeb.UserSessionController do
 
   def create(conn, params) do
     create(conn, params, "Welcome back!")
+  end
+
+  # auto log in after registration
+  def auto_login(conn, %{"token" => token}) do
+    with {:ok, user_id} <-
+           Phoenix.Token.verify(AtomicWordsWeb.Endpoint, "auto_login", token, max_age: 600),
+         %User{} = user <- Accounts.get_user!(user_id) do
+      conn
+      |> put_flash(:info, "Account created successfully.")
+      |> UserAuth.log_in_user(user)
+    else
+      _ ->
+        conn
+        |> put_flash(:error, "Auto login link is invalid or expired.")
+        |> redirect(to: ~p"/users/log-in")
+    end
   end
 
   # magic link login

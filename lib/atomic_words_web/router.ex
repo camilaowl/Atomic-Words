@@ -79,6 +79,7 @@ defmodule AtomicWordsWeb.Router do
     end
 
     post "/users/log-in", UserSessionController, :create
+    get "/users/auto-log-in/:token", UserSessionController, :auto_login
     delete "/users/log-out", UserSessionController, :delete
   end
 end

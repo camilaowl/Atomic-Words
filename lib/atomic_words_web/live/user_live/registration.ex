@@ -108,10 +108,12 @@ defmodule AtomicWordsWeb.UserLive.Registration do
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
+        token = Phoenix.Token.sign(AtomicWordsWeb.Endpoint, "auto_login", user.id)
+
         {:noreply,
          socket
          |> put_flash(:info, "Account created successfully.")
-         |> push_navigate(to: ~p"/users/log-in?user=#{user_params}")}
+         |> push_navigate(to: ~p"/users/auto-log-in/#{token}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
