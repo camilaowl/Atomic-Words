@@ -6,38 +6,29 @@ defmodule AtomicWordsWeb.HomeLive do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-row justify-center w-full">
-      <div id="menu" class="flex flex-col w-1/4">
-        <ul>
-          <.link navigate={~p"/settings"}>
-            Go to Settings
-          </.link>
-          <li><button class="button" phx-click="go_to_settings">Go to Settings</button></li>
-          <li><button class="button" phx-click="go_to_stats">Go to Stats</button></li>
-          <li><button class="button" phx-click="words">Words</button></li>
-        </ul>
-      </div>
+    <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:home}>
+      <div class="flex flex-row justify-center w-full">
+        <div class="flex-col justify-center w-1/2">
+          <.live_component
+            module={AtomicWordsWeb.LiveComponents.SearchComponent}
+            id="search"
+            translation_result={@translation_result}
+          />
 
-      <div class="flex-col justify-center w-1/2">
-        <.live_component
-          module={AtomicWordsWeb.LiveComponents.SearchComponent}
-          id="search"
-          translation_result={@translation_result}
-        />
-
-        <div id="words-list" class="mt-5" style="margin-top: 20px;">
-          <h1>The last added:</h1>
-          <ul class="pt-4">
-            <%= for word <- @last_added do %>
-              <section>
-                <li>{word.text} ({word.lang})</li>
-              </section>
-            <% end %>
-          </ul>
+          <div id="words-list" class="mt-5" style="margin-top: 20px;">
+            <h1>The last added:</h1>
+            <ul class="pt-4">
+              <%= for word <- @last_added do %>
+                <section>
+                  <li>{word.text} ({word.lang})</li>
+                </section>
+              <% end %>
+            </ul>
+          </div>
         </div>
+        <div id="spacer" class="w-1/4" />
       </div>
-      <div id="spacer" class="w-1/4" />
-    </div>
+    </Layouts.app>
     """
   end
 
@@ -48,6 +39,7 @@ defmodule AtomicWordsWeb.HomeLive do
         {:error, _reason} -> "Translation error"
       end
 
+    # todo replace with current user id
     last_added = Words.last_added_user_words(1, 30)
 
     socket =
@@ -59,16 +51,4 @@ defmodule AtomicWordsWeb.HomeLive do
   end
 
   def mount(_params, session, socket), do: mount(%{"search" => ""}, session, socket)
-
-  def handle_event("go_to_settings", _value, socket) do
-    {:noreply, push_navigate(socket, to: "/settings")}
-  end
-
-  def handle_event("go_to_stats", _value, socket) do
-    {:noreply, push_navigate(socket, to: "/stats")}
-  end
-
-  def handle_event("words", _value, socket) do
-    {:noreply, push_navigate(socket, to: "/words")}
-  end
 end

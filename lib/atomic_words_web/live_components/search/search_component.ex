@@ -69,6 +69,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   end
 
   def mount(socket) do
+    # todo replace with current user id
     added_word_ids =
       Words.find_user_words_by_user_id(1)
       |> Enum.map(fn uw -> uw.word_id end)
@@ -116,10 +117,12 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     reply_socket =
       case Integer.parse(item_id) do
         {int, _rest} ->
+          # todo replace with current user id
           case Words.add_user_word(1, int) do
             {:ok, _user_word} ->
               Map.update(socket, :assigns, socket.assigns, fn _ -> socket.assigns end)
 
+              # todo replace with current user id
               added_word_ids =
                 Words.find_user_words_by_user_id(1)
                 |> Enum.map(fn uw -> uw.word_id end)

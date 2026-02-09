@@ -1,6 +1,8 @@
 defmodule AtomicWordsWeb.Router do
   use AtomicWordsWeb, :router
 
+  import AtomicWordsWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule AtomicWordsWeb.Router do
     plug :put_root_layout, html: {AtomicWordsWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_scope_for_user
   end
 
   pipeline :api do
@@ -18,16 +21,11 @@ defmodule AtomicWordsWeb.Router do
     pipe_through :browser
 
     get "/onboarding", AuthController, :onboarding
-    get "/login", AuthController, :login
-    get "/sign_up", AuthController, :sign_up
-    post "/logout", AuthController, :logout
-    # get "/", PageController, :home
-    live "/", HomeLive
-    get "/words", WordsController, :index
     get "/word_details", WordsController, :word_details
     get "/practice", WordsController, :practice
-    get "/stats", StatsController, :stats
-    get "/settings", SettingsController, :settings
+    get "/users/log-out", UserSessionController, :delete
+    get "/auth/google", GoogleAuthController, :index
+    get "/auth/google/callback", GoogleAuthController, :index
   end
 
   # Other scopes may use custom stacks.
@@ -50,5 +48,38 @@ defmodule AtomicWordsWeb.Router do
       live_dashboard "/dashboard", metrics: AtomicWordsWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", AtomicWordsWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{AtomicWordsWeb.UserAuth, :require_authenticated}] do
+      live "/users/settings", UserLive.Settings, :edit
+      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/", HomeLive
+      live "/words", WordsLive
+      live "/stats", StatisticsLive
+      live "/statistics", StatisticsLive
+    end
+
+    post "/users/update-password", UserSessionController, :update_password
+  end
+
+  scope "/", AtomicWordsWeb do
+    pipe_through [:browser]
+
+    live_session :current_user,
+      on_mount: [{AtomicWordsWeb.UserAuth, :mount_current_scope}] do
+      live "/users/register", UserLive.Registration, :new
+      live "/users/log-in", UserLive.Login, :new
+      live "/users/log-in/:token", UserLive.Confirmation, :new
+    end
+
+    post "/users/log-in", UserSessionController, :create
+    get "/users/auto-log-in/:token", UserSessionController, :auto_login
+    delete "/users/log-out", UserSessionController, :delete
   end
 end
