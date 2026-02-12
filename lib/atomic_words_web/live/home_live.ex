@@ -12,6 +12,7 @@ defmodule AtomicWordsWeb.HomeLive do
           <.live_component
             module={AtomicWordsWeb.LiveComponents.SearchComponent}
             id="search"
+            current_scope={@current_scope}
             translation_result={@translation_result}
           />
 
@@ -39,8 +40,10 @@ defmodule AtomicWordsWeb.HomeLive do
         {:error, _reason} -> "Translation error"
       end
 
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+
     # todo replace with current user id
-    last_added = Words.last_added_user_words(1, 30)
+    last_added = Words.last_added_user_words(user_id, 30)
 
     socket =
       socket
