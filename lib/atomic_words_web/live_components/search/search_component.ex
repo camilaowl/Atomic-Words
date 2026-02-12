@@ -92,11 +92,13 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     {:ok, socket}
   end
 
+  @impl true
   def handle_event("change", %{"search" => ""}, socket) do
     socket = assign(socket, :search_results, [])
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("change", %{"search" => search_query}, socket) do
     if String.length(search_query) > 2 do
       search_results =
@@ -110,6 +112,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     end
   end
 
+  @impl true
   def handle_event("clear_search", _params, socket) do
     socket =
       socket
@@ -119,6 +122,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("add_item", %{"id" => item_id}, socket) do
     %{user: %{id: user_id}} = socket.assigns.current_scope
 
@@ -140,6 +144,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     {:noreply, reply_socket}
   end
 
+  @impl true
   def handle_event("switch_languages", _params, socket) do
     origin_lang = socket.assigns.origin_lang
     target_lang = socket.assigns.target_lang

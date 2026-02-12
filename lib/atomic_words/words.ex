@@ -20,7 +20,7 @@ defmodule AtomicWords.Words do
     case DictionaryClient.valid_word(input) do
       {:found, _body} ->
         input
-        |> Translator.translate(original_lang)
+        |> Translator.translate(target_lang)
         |> IO.inspect(label: "translation result")
         |> dbg()
         |> case do
@@ -44,15 +44,21 @@ defmodule AtomicWords.Words do
       select: w
   end
 
+  @spec add_word(any(), any()) :: any()
   def add_word(word, lang) do
-    Repo.insert(%Word{text: word, lang: lang})
+    Repo.insert(%Word{text: word, lang: lang},
+      on_conflict: :nothing,
+      conflict_target: [:text, :lang]
+    )
   end
 
   def add_translated_word(original_word, translated_word, original_lang, translated_lang) do
-    {:ok, original} = Repo.insert(%Word{text: original_word, lang: original_lang})
-    {:ok, translated} = Repo.insert(%Word{text: translated_word, lang: translated_lang})
+    {:ok, original} = add_word(original_word, original_lang)
+    {:ok, translated} = add_word(translated_word, translated_lang)
     bind_words(original.id, translated.id)
+
     {:ok, original, translated}
+    |> IO.inspect(label: "add_translated_word result")
   end
 
   def bind_words(word_id, translation_id) do
