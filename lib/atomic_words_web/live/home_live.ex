@@ -33,6 +33,7 @@ defmodule AtomicWordsWeb.HomeLive do
     """
   end
 
+  @impl true
   def mount(%{"search" => word}, _session, socket) do
     translation_result =
       case AtomicWords.Translator.translate(word, "uk") do
@@ -43,7 +44,7 @@ defmodule AtomicWordsWeb.HomeLive do
     %{user: %{id: user_id}} = socket.assigns.current_scope
 
     # todo replace with current user id
-    last_added = Words.last_added_user_words(user_id, 30)
+    last_added = Words.last_added_user_words(user_id)
 
     socket =
       socket
@@ -53,5 +54,18 @@ defmodule AtomicWordsWeb.HomeLive do
     {:ok, socket}
   end
 
+  @impl true
   def mount(_params, session, socket), do: mount(%{"search" => ""}, session, socket)
+
+  @impl true
+  def handle_info({:word_added, _added_word}, socket) do
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+    last_added = Words.last_added_user_words(user_id)
+
+    socket =
+      socket
+      |> assign(:last_added, last_added)
+
+    {:noreply, socket}
+  end
 end
