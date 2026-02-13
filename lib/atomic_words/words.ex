@@ -46,10 +46,7 @@ defmodule AtomicWords.Words do
 
   @spec add_word(any(), any()) :: any()
   def add_word(word, lang) do
-    Repo.insert(%Word{text: word, lang: lang},
-      on_conflict: :nothing,
-      conflict_target: [:text, :lang]
-    )
+    Repo.insert(%Word{text: word, lang: lang})
   end
 
   def add_translated_word(original_word, translated_word, original_lang, translated_lang) do
@@ -75,7 +72,10 @@ defmodule AtomicWords.Words do
   end
 
   def add_user_word(user_id, word_id) do
-    Repo.insert(%UserWords{user_id: user_id, word_id: word_id})
+    Repo.insert(%UserWords{user_id: user_id, word_id: word_id},
+      on_conflict: :nothing,
+      conflict_target: [:user_id, :word_id]
+    )
   end
 
   def delete_user_word_by_id(word_id) do

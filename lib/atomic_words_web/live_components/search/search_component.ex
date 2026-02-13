@@ -75,7 +75,6 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
       socket
       |> assign(:search_query, "")
       |> assign(:search_results, [])
-      |> assign(:added_word_ids, MapSet.new())
       |> assign(:origin_lang, "en")
       |> assign(:target_lang, "uk")
 
@@ -87,7 +86,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     socket =
       socket
       |> assign(assigns)
-      |> assign_new(:added_word_ids, fn -> load_added_word_ids(user_id) end)
+      |> assign(:added_word_ids, load_added_word_ids(user_id))
 
     {:ok, socket}
   end
