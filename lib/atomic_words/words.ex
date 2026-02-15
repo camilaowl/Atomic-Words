@@ -6,6 +6,8 @@ defmodule AtomicWords.Words do
   alias AtomicWords.Schema.UserWords
   alias AtomicWords.Translator
   alias AtomicWords.DictionaryClient
+  # alias AtomicWords.Preferencies
+  alias AtomicWords.Models.WordModel
 
   def search_partial(input, original_lang, target_lang) do
     query = search_partial_query(input)
@@ -88,7 +90,7 @@ defmodule AtomicWords.Words do
   end
 
   def last_added_user_words(user_id, limit \\ 30) do
-    query =
+    original_words_query =
       from uw in UserWords,
         join: w in Word,
         on: uw.word_id == w.id,
@@ -97,6 +99,29 @@ defmodule AtomicWords.Words do
         limit: ^limit,
         select: w
 
-    Repo.all(query)
+    # selected_target_lang = Preferencies.selected_target_lang(user_id)
+
+    words_with_translations =
+      for word <- Repo.all(original_words_query) do
+        translation_query =
+          from wt in WordTranslation,
+            join: w in Word,
+            on: wt.translation_id == w.id,
+            where: wt.word_id == ^word.id,
+            select: w
+
+        translations = Repo.all(translation_query)
+
+        %WordModel{
+          :word => word.text,
+          :transcription => word.transcription,
+          :lang => word.lang,
+          :translations => translations,
+          :translated_lang => nil,
+          :use_case => word.use_case
+        }
+      end
+
+    words_with_translations
   end
 end

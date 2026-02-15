@@ -21,7 +21,7 @@ defmodule AtomicWordsWeb.HomeLive do
             <ul class="pt-4">
               <%= for word <- @last_added do %>
                 <section>
-                  <WordListItem.word_list_item word={word} translation={word} />
+                  <WordListItem.word_list_item word={word} />
                 </section>
               <% end %>
             </ul>
