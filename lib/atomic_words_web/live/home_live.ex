@@ -21,7 +21,7 @@ defmodule AtomicWordsWeb.HomeLive do
             <ul class="pt-4">
               <%= for word <- @last_added do %>
                 <section>
-                  <li>{word.text} ({word.lang})</li>
+                  <WordListItem.word_list_item word={word} translation={word} />
                 </section>
               <% end %>
             </ul>
@@ -43,7 +43,6 @@ defmodule AtomicWordsWeb.HomeLive do
 
     %{user: %{id: user_id}} = socket.assigns.current_scope
 
-    # todo replace with current user id
     last_added = Words.last_added_user_words(user_id)
 
     socket =
