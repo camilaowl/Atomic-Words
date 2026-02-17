@@ -9,21 +9,18 @@ defmodule WordListItem do
   def word_list_item(assigns) do
     ~H"""
     <div
-      class="word-list-item flex flex-row justify-items-stretch h-12 justify-center rounded-lg shadow-sm w-full"
+      class="word-list-item flex p-2 flex-col justify-items h-fit justify-center rounded-lg shadow-sm w-full"
       {@rest}
     >
       <div class="flex flex-row items-center">
-        <h2 class="size-fit text-2xl  text-green-500 font-bold border-2 border-green-500 bg-green-100 rounded-lg ">
-          {@word.lang}
+        <h2 class="size-fit text-2xl font-bold">{@word.word}</h2>
+        <h2 class="size-fit text-md pl-2  text-gray-500 font-bold">
+          {@word.us_transcription}
         </h2>
-        <h2 class="size-fit p-2 text-2xl font-bold">{@word.word}</h2>
       </div>
 
       <div class="flex flex-row items-center">
-        <h2 class="size-fit text-2xl  text-green-500 font-bold border-2 border-green-500 bg-green-100 rounded-lg ">
-          {@word.translated_lang}
-        </h2>
-        <h2 class="size-fit p-2 text-2xl font-bold">
+        <h2 class="size-fit text-xl">
           <%= for translation <- @word.translations do %>
             <span class="mr-2">{translation.text}</span>
           <% end %>

@@ -60,6 +60,19 @@ defmodule AtomicWords.Words do
     |> IO.inspect(label: "add_translated_word result")
   end
 
+  def add_transcriptions_to_word(word, uk_transcription, us_transcription) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    from(w in Word, where: w.text == ^word)
+    |> Repo.update_all(
+      set: [
+        uk_transcription: uk_transcription,
+        us_transcription: us_transcription,
+        updated_at: now
+      ]
+    )
+  end
+
   def bind_words(word_id, translation_id) do
     Repo.insert(%WordTranslation{word_id: word_id, translation_id: translation_id})
   end
@@ -114,7 +127,8 @@ defmodule AtomicWords.Words do
 
         %WordModel{
           :word => word.text,
-          :transcription => word.transcription,
+          :us_transcription => word.us_transcription,
+          :uk_transcription => word.uk_transcription,
           :lang => word.lang,
           :translations => translations,
           :translated_lang => nil,
