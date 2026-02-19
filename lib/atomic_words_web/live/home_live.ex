@@ -12,18 +12,18 @@ defmodule AtomicWordsWeb.HomeLive do
           <.live_component
             module={AtomicWordsWeb.LiveComponents.SearchComponent}
             id="search"
+            current_scope={@current_scope}
             translation_result={@translation_result}
           />
 
           <div id="words-list" class="mt-5" style="margin-top: 20px;">
             <h1>The last added:</h1>
-            <ul class="pt-4">
-              <%= for word <- @last_added do %>
-                <section>
-                  <li>{word.text} ({word.lang})</li>
-                </section>
-              <% end %>
-            </ul>
+            <.live_component
+              module={AtomicWordsWeb.LiveComponents.Words.WordList}
+              id="last-added"
+              words={@last_added}
+              current_scope={@current_scope}
+            />
           </div>
         </div>
         <div id="spacer" class="w-1/4" />
@@ -32,6 +32,7 @@ defmodule AtomicWordsWeb.HomeLive do
     """
   end
 
+  @impl true
   def mount(%{"search" => word}, _session, socket) do
     translation_result =
       case AtomicWords.Translator.translate(word, "uk") do
@@ -39,8 +40,9 @@ defmodule AtomicWordsWeb.HomeLive do
         {:error, _reason} -> "Translation error"
       end
 
-    # todo replace with current user id
-    last_added = Words.last_added_user_words(1, 30)
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+
+    last_added = Words.last_added_user_words(user_id)
 
     socket =
       socket
@@ -50,5 +52,28 @@ defmodule AtomicWordsWeb.HomeLive do
     {:ok, socket}
   end
 
+  @impl true
   def mount(_params, session, socket), do: mount(%{"search" => ""}, session, socket)
+
+  @impl true
+  def handle_info({:word_added, _added_word}, socket) do
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+    last_added = Words.last_added_user_words(user_id)
+
+    socket =
+      socket
+      |> assign(:last_added, last_added)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:word_deleted, _id}, socket) do
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+    last_added = Words.last_added_user_words(user_id)
+
+    socket = assign(socket, :last_added, last_added)
+
+    {:noreply, socket}
+  end
 end

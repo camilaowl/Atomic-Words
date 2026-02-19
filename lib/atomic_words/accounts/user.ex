@@ -77,14 +77,6 @@ defmodule AtomicWords.Accounts.User do
     # |> put_password_hash()
   end
 
-  defp put_password_hash(changeset) do
-    if password = get_change(changeset, :password) do
-      put_change(changeset, :hashed_password, Bcrypt.hash_pwd_salt(password))
-    else
-      changeset
-    end
-  end
-
   @doc """
   A changeset for creating a user via Google OAuth.
   """

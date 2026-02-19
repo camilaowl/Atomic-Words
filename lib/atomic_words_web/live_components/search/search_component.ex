@@ -4,6 +4,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   import AtomicWordsWeb.CoreComponents
   alias AtomicWords.Words
 
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="flex flex-col relative w-full">
@@ -68,29 +69,35 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     """
   end
 
+  @impl true
   def mount(socket) do
-    # todo replace with current user id
-    added_word_ids =
-      Words.find_user_words_by_user_id(1)
-      |> Enum.map(fn uw -> uw.word_id end)
-      |> MapSet.new()
-
     socket =
       socket
       |> assign(:search_query, "")
       |> assign(:search_results, [])
-      |> assign(:added_word_ids, added_word_ids)
       |> assign(:origin_lang, "en")
       |> assign(:target_lang, "uk")
 
     {:ok, socket}
   end
 
+  @impl true
+  def update(%{current_scope: %{user: %{id: user_id}}} = assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(:added_word_ids, load_added_word_ids(user_id))
+
+    {:ok, socket}
+  end
+
+  @impl true
   def handle_event("change", %{"search" => ""}, socket) do
     socket = assign(socket, :search_results, [])
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("change", %{"search" => search_query}, socket) do
     if String.length(search_query) > 2 do
       search_results =
@@ -104,6 +111,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     end
   end
 
+  @impl true
   def handle_event("clear_search", _params, socket) do
     socket =
       socket
@@ -113,22 +121,18 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("add_item", %{"id" => item_id}, socket) do
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+
     reply_socket =
       case Integer.parse(item_id) do
         {int, _rest} ->
-          # todo replace with current user id
-          case Words.add_user_word(1, int) do
-            {:ok, _user_word} ->
-              Map.update(socket, :assigns, socket.assigns, fn _ -> socket.assigns end)
-
-              # todo replace with current user id
-              added_word_ids =
-                Words.find_user_words_by_user_id(1)
-                |> Enum.map(fn uw -> uw.word_id end)
-                |> MapSet.new()
-
-              assign(socket, :added_word_ids, added_word_ids)
+          case Words.add_user_word(user_id, int) do
+            {:ok, added_word} ->
+              socket = assign(socket, :added_word_ids, load_added_word_ids(user_id))
+              send(self(), {:word_added, added_word})
+              socket
 
             {:error, _changeset} ->
               socket
@@ -141,6 +145,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     {:noreply, reply_socket}
   end
 
+  @impl true
   def handle_event("switch_languages", _params, socket) do
     origin_lang = socket.assigns.origin_lang
     target_lang = socket.assigns.target_lang
@@ -151,5 +156,12 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
       |> assign(:target_lang, origin_lang)
 
     {:noreply, socket}
+  end
+
+  defp load_added_word_ids(user_id) do
+    user_id
+    |> Words.find_user_words_by_user_id()
+    |> Enum.map(& &1.word_id)
+    |> MapSet.new()
   end
 end

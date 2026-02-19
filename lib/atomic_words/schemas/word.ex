@@ -5,6 +5,8 @@ defmodule AtomicWords.Schema.Word do
   schema "words" do
     field :text, :string
     field :transcription, :string
+    field :uk_transcription, :string
+    field :us_transcription, :string
     field :use_case, :string
     field :lang, :string, default: "en"
 
@@ -14,7 +16,7 @@ defmodule AtomicWords.Schema.Word do
   @doc false
   def changeset(word, attrs) do
     word
-    |> cast(attrs, [:text, :transcription, :use_case, :lang])
+    |> cast(attrs, [:text, :transcription, :uk_transcription, :us_transcription, :use_case, :lang])
     |> validate_required([:text, :transcription, :use_case, :lang])
   end
 end
