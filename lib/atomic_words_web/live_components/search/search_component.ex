@@ -130,8 +130,9 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
         {int, _rest} ->
           case Words.add_user_word(user_id, int) do
             {:ok, added_word} ->
-              assign(socket, :added_word_ids, load_added_word_ids(user_id))
+              socket = assign(socket, :added_word_ids, load_added_word_ids(user_id))
               send(self(), {:word_added, added_word})
+              socket
 
             {:error, _changeset} ->
               socket

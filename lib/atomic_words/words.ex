@@ -93,10 +93,10 @@ defmodule AtomicWords.Words do
     )
   end
 
-  def delete_user_word_by_id(word_id) do
+  def delete_user_word_by_id(user_id, word_id) do
     query =
       from uw in UserWords,
-        where: uw.word_id == ^word_id,
+        where: uw.user_id == ^user_id and uw.word_id == ^word_id,
         select: uw
 
     Repo.delete_all(query)
@@ -126,6 +126,7 @@ defmodule AtomicWords.Words do
         translations = Repo.all(translation_query)
 
         %WordModel{
+          :id => word.id,
           :word => word.text,
           :us_transcription => word.us_transcription,
           :uk_transcription => word.uk_transcription,

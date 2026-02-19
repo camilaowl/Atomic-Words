@@ -5,6 +5,7 @@ defmodule WordListItem do
 
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the element"
   attr :word, :map, required: true, doc: "the original word to display"
+  attr :target, :any, default: nil
 
   def word_list_item(assigns) do
     ~H"""
@@ -17,6 +18,16 @@ defmodule WordListItem do
         <h2 class="size-fit text-md pl-2  text-gray-500 font-bold">
           {@word.us_transcription}
         </h2>
+
+        <.button
+          class="size-10 ml-auto items-center"
+          variant="primary"
+          phx-click="delete_word"
+          phx-value-id={@word.id}
+          phx-target={@target}
+        >
+          <.icon name="hero-trash" class="" />
+        </.button>
       </div>
 
       <div class="flex flex-row items-center">
