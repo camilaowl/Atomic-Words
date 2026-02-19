@@ -7,6 +7,19 @@
 # General application configuration
 import Config
 
+config :atomic_words, :scopes,
+  user: [
+    default: true,
+    module: AtomicWords.Accounts.Scope,
+    assign_key: :current_scope,
+    access_path: [:user, :id],
+    schema_key: :user_id,
+    schema_type: :id,
+    schema_table: :users,
+    test_data_fixture: AtomicWords.AccountsFixtures,
+    test_setup_helper: :register_and_log_in_user
+  ]
+
 config :atomic_words,
   ecto_repos: [AtomicWords.Repo],
   generators: [timestamp_type: :utc_datetime]
@@ -59,6 +72,9 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# Configure Goth for Google Cloud authentication
+config :goth, json: "config/atomicwords-92914dc1a721.json" |> File.read!()
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

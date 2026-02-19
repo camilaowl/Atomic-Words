@@ -5,7 +5,7 @@ defmodule AtomicWords.MixProject do
     [
       app: :atomic_words,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19.3",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -40,6 +40,7 @@ defmodule AtomicWords.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.8.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
@@ -65,7 +66,11 @@ defmodule AtomicWords.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:google_api_translate, "~> 0.22.0"},
+      {:goth, "~> 1.3"},
+      {:finch, "~> 0.18"},
+      {:elixir_auth_google, "~> 1.6.9"}
     ]
   end
 

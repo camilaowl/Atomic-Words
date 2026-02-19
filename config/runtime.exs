@@ -20,6 +20,11 @@ if System.get_env("PHX_SERVER") do
   config :atomic_words, AtomicWordsWeb.Endpoint, server: true
 end
 
+# Configure Elixir Auth Google with environment variables
+config :elixir_auth_google,
+  client_id: System.get_env("GOOGLE_CLIENT_ID") || "",
+  client_secret: System.get_env("GOOGLE_CLIENT_SECRET") || ""
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

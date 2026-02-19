@@ -35,3 +35,6 @@ atomic_words-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/config/atomicwords-92914dc1a721.json
+
+.env

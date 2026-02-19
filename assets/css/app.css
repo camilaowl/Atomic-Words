@@ -1,7 +1,7 @@
 /* See the Tailwind configuration guide for advanced usage
    https://tailwindcss.com/docs/configuration */
 
-@import "tailwindcss" source(none);
+@import "tailwindcss";
 @source "../css";
 @source "../js";
 @source "../../lib/atomic_words_web";
@@ -100,6 +100,50 @@
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* Make LiveView wrapper divs transparent for layout */
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents
+}
 
 /* This file is for your main application CSS */
+
+@layer base {
+  button {
+    font: inherit;
+    padding: 0.5rem 1rem;
+    margin: 0;
+    border-radius: 25px;
+    background-color: oklch(58% 0.233 277.117);
+    color: oklch(96% 0.018 272.314);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:active {
+    transform: translateY(0);
+    background-color: oklch(48% 0.233 277.117);
+  }
+
+  .add_word_input {
+    display: inline;
+
+    background-color: transparent;
+  }
+
+  .add_word_input:focus {
+    outline: none;
+  }
+
+  .add_word_form {
+    position: relative;
+    border: 2px solid white;
+    border-radius: 25px;
+    padding: 24px;
+  }
+
+  icon {
+    padding-right: 24px;
+    color: white;
+  }
+}
