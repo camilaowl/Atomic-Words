@@ -1,4 +1,4 @@
-defmodule AtomicWords.Schema.WordTranslation do
+defmodule AtomicWords.Dictionary.WordTranslation do
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,6 +1,4 @@
 defmodule AtomicWords.Translator do
-  import Ecto.Query
-
   @moduledoc """
   Handles translation of words using Google Translate API.
   """

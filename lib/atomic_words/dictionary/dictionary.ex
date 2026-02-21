@@ -1,13 +1,12 @@
-defmodule AtomicWords.Words do
+defmodule AtomicWords.Dictionary do
   import Ecto.Query
   alias AtomicWords.Repo
-  alias AtomicWords.Schema.Word
-  alias AtomicWords.Schema.WordTranslation
-  alias AtomicWords.Schema.UserWords
+  alias AtomicWords.Dictionary.Word
+  alias AtomicWords.Dictionary.WordTranslation
+  alias AtomicWords.Dictionary.UserWords
   alias AtomicWords.Translator
   alias AtomicWords.DictionaryClient
-  # alias AtomicWords.Preferencies
-  alias AtomicWords.Models.WordModel
+  alias AtomicWords.Dictionary.WordViewModel
 
   def search_partial(input, original_lang, target_lang) do
     query = search_partial_query(input)
@@ -77,13 +76,20 @@ defmodule AtomicWords.Words do
     Repo.insert(%WordTranslation{word_id: word_id, translation_id: translation_id})
   end
 
-  def find_user_words_by_user_id(user_id) do
+  def user_words(user_id) do
+    words_ids = user_words_ids(user_id)
+    query = from w in Word, where: w.id in ^words_ids
+    for word <- Repo.all(query), do: word_with_translations(word)
+  end
+
+  def user_words_ids(user_id) do
     query =
       from uw in UserWords,
         where: uw.user_id == ^user_id,
         select: uw
 
     Repo.all(query)
+    |> Enum.map(& &1.word_id)
   end
 
   def add_user_word(user_id, word_id) do
@@ -102,6 +108,28 @@ defmodule AtomicWords.Words do
     Repo.delete_all(query)
   end
 
+  def word_with_translations(word) do
+    translation_query =
+      from wt in WordTranslation,
+        join: w in Word,
+        on: wt.translation_id == w.id,
+        where: wt.word_id == ^word.id,
+        select: w
+
+    translations = Repo.all(translation_query)
+
+    %WordViewModel{
+      :id => word.id,
+      :word => word.text,
+      :us_transcription => word.us_transcription,
+      :uk_transcription => word.uk_transcription,
+      :lang => word.lang,
+      :translations => translations,
+      :translated_lang => nil,
+      :use_case => word.use_case
+    }
+  end
+
   def last_added_user_words(user_id, limit \\ 30) do
     original_words_query =
       from uw in UserWords,
@@ -112,29 +140,9 @@ defmodule AtomicWords.Words do
         limit: ^limit,
         select: w
 
-    # selected_target_lang = Preferencies.selected_target_lang(user_id)
-
     words_with_translations =
       for word <- Repo.all(original_words_query) do
-        translation_query =
-          from wt in WordTranslation,
-            join: w in Word,
-            on: wt.translation_id == w.id,
-            where: wt.word_id == ^word.id,
-            select: w
-
-        translations = Repo.all(translation_query)
-
-        %WordModel{
-          :id => word.id,
-          :word => word.text,
-          :us_transcription => word.us_transcription,
-          :uk_transcription => word.uk_transcription,
-          :lang => word.lang,
-          :translations => translations,
-          :translated_lang => nil,
-          :use_case => word.use_case
-        }
+        word_with_translations(word)
       end
 
     words_with_translations

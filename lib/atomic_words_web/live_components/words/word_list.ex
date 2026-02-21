@@ -1,7 +1,7 @@
 defmodule AtomicWordsWeb.LiveComponents.Words.WordList do
   use AtomicWordsWeb, :live_component
 
-  alias AtomicWords.Words
+  alias AtomicWords.Dictionary
   attr :words, :list, default: []
   attr :current_scope, :any, required: true
 
@@ -22,7 +22,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.WordList do
   @impl true
   def handle_event("delete_word", %{"id" => id}, socket) do
     %{user: %{id: user_id}} = socket.assigns.current_scope
-    Words.delete_user_word_by_id(user_id, id)
+    Dictionary.delete_user_word_by_id(user_id, id)
     send(self(), {:word_deleted, id})
     {:noreply, socket}
   end
