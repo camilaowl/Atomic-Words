@@ -1,8 +1,7 @@
 defmodule AtomicWordsWeb.TrainingLive do
-  alias AtomicWords.Dictionary
   use AtomicWordsWeb, :live_view
 
-  alias AtomicWords.Words
+  alias AtomicWords.Training
 
   @impl true
   def render(assigns) do
@@ -22,7 +21,7 @@ defmodule AtomicWordsWeb.TrainingLive do
                 module={AtomicWordsWeb.LiveComponents.Training.Flashcards}
                 id="flashcards"
                 current_scope={@current_scope}
-                words={@words}
+                flash_card={@current_flash_card}
               />
             <% else %>
               <button
@@ -41,18 +40,50 @@ defmodule AtomicWordsWeb.TrainingLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    words = Dictionary.user_words(socket.assigns.current_scope.user.id)
+    active_session = Training.active_session_for_user(socket.assigns.current_scope.user.id)
+
+    cards =
+      if active_session, do: Training.flashcards_for_session(active_session.id), else: []
 
     socket =
       socket
-      |> assign(:words, words)
-      |> assign(:active_session, nil)
+      |> assign(:active_session, active_session)
+      # |> assign(:flash_cards, rest)
+      |> assign(:current_flash_card, List.first(cards))
 
     {:ok, socket}
   end
 
   @impl true
   def handle_event("start_training", _params, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    case Training.start_training(user_id) do
+      {:ok, session} ->
+        [current, _] = Training.flashcards_for_session(session.id)
+
+        socket =
+          socket
+          |> assign(:active_session, session)
+          # |> assign(:flash_cards, flash_cards)
+          |> assign(:current_flash_card, current)
+
+        {:noreply, socket}
+
+      {:error, _changeset} ->
+        {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("wrong_answer", %{"id" => id}, socket) do
+    Training.flash_card_answer(id, false)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("right_answer", %{"id" => id}, socket) do
+    Training.flash_card_answer(id, true)
     {:noreply, socket}
   end
 end

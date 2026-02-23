@@ -108,6 +108,15 @@ defmodule AtomicWords.Dictionary do
     Repo.delete_all(query)
   end
 
+  def word_by_id(id) do
+    query =
+      from w in Word,
+        where: w.id == ^id,
+        select: w
+
+    word_with_translations(Repo.one(query))
+  end
+
   def word_with_translations(word) do
     translation_query =
       from wt in WordTranslation,

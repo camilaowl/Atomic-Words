@@ -10,10 +10,10 @@ defmodule AtomicWords.Training.Session do
   end
 
   @doc false
-  def changeset(sessions, attrs, user_scope) do
+  def changeset(sessions, attrs, user_id) do
     sessions
     |> cast(attrs, [:user_id, :completed_at])
-    |> validate_required([:user_id, :completed_at])
-    |> put_change(:user_id, user_scope.user.id)
+    |> validate_required([:user_id])
+    |> put_change(:user_id, user_id)
   end
 end
