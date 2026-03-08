@@ -9,7 +9,8 @@ defmodule AtomicWords.Training.FlashCardViewModel do
     :uk_transcription,
     :lang,
     :translations,
-    :translated_lang
+    :translated_lang,
+    :is_correct
   ]
 
   def map(flash_card, word, session_id) do
@@ -22,7 +23,8 @@ defmodule AtomicWords.Training.FlashCardViewModel do
       :uk_transcription => word.uk_transcription,
       :lang => word.lang,
       :translations => Enum.map(word.translations, & &1.text),
-      :translated_lang => word.translated_lang
+      :translated_lang => word.translated_lang,
+      :is_correct => flash_card.is_correct
     }
   end
 end

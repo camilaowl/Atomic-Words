@@ -20,20 +20,163 @@
 // Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
-import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
-import {hooks as colocatedHooks} from "phoenix-colocated/atomic_words"
+import { Socket } from "phoenix"
+import { LiveSocket } from "phoenix_live_view"
+import { hooks as colocatedHooks } from "phoenix-colocated/atomic_words"
 import topbar from "../vendor/topbar"
+
+const FlashcardSwipe = {
+  mounted() {
+    this.cardEl = this.el.querySelector(".flashcard")
+    this.actionButtons = this.el.querySelectorAll("[data-flashcard-action]")
+    this.flashcardId = this.el.dataset.flashcardId
+    this.isAnimating = false
+    this.isDragging = false
+    this.hasMoved = false
+    this.suppressClick = false
+
+    this.handleButtonClick = event => {
+      if (this.isAnimating) return
+      event.preventDefault()
+      const action = event.currentTarget.dataset.flashcardAction
+      const direction = action === "right" ? "right" : "left"
+      this.commitSwipe(direction)
+    }
+
+    this.handlePointerDown = event => {
+      if (!this.cardEl || this.isAnimating) return
+      if (event.button !== undefined && event.button !== 0) return
+
+      this.isDragging = true
+      this.hasMoved = false
+      this.startX = event.clientX
+      this.currentX = event.clientX
+      this.cardEl.classList.add("dragging")
+      this.cardEl.setPointerCapture(event.pointerId)
+    }
+
+    this.handlePointerMove = event => {
+      if (!this.isDragging) return
+      this.currentX = event.clientX
+      const deltaX = this.currentX - this.startX
+      if (Math.abs(deltaX) > 6) this.hasMoved = true
+
+      const rotate = Math.max(Math.min(deltaX / 18, 12), -12)
+      const opacity = Math.max(1 - Math.abs(deltaX) / 360, 0.2)
+      this.cardEl.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`
+      this.cardEl.style.opacity = opacity
+    }
+
+    this.handlePointerUp = event => {
+      if (!this.isDragging) return
+      this.isDragging = false
+      this.cardEl.releasePointerCapture(event.pointerId)
+      this.cardEl.classList.remove("dragging")
+
+      const deltaX = this.currentX - this.startX
+      const threshold = 90
+      if (Math.abs(deltaX) >= threshold) {
+        this.suppressClick = true
+        const direction = deltaX > 0 ? "right" : "left"
+        this.commitSwipe(direction)
+      } else {
+        this.suppressClick = this.hasMoved
+        this.resetCard()
+      }
+    }
+
+    this.handleCardClick = event => {
+      if (!this.suppressClick) return
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      this.suppressClick = false
+    }
+
+    this.bindCardListeners()
+
+    this.actionButtons.forEach(button => {
+      button.addEventListener("click", this.handleButtonClick)
+    })
+  },
+
+  updated() {
+    const nextCardEl = this.el.querySelector(".flashcard")
+    if (nextCardEl !== this.cardEl) {
+      this.unbindCardListeners()
+      this.cardEl = nextCardEl
+      this.bindCardListeners()
+    }
+
+    this.actionButtons.forEach(button => {
+      button.removeEventListener("click", this.handleButtonClick)
+    })
+    this.actionButtons = this.el.querySelectorAll("[data-flashcard-action]")
+    this.actionButtons.forEach(button => {
+      button.addEventListener("click", this.handleButtonClick)
+    })
+
+    this.flashcardId = this.el.dataset.flashcardId
+    this.resetCard()
+  },
+
+  destroyed() {
+    this.unbindCardListeners()
+
+    this.actionButtons.forEach(button => {
+      button.removeEventListener("click", this.handleButtonClick)
+    })
+  },
+
+  bindCardListeners() {
+    if (!this.cardEl) return
+    this.cardEl.addEventListener("pointerdown", this.handlePointerDown)
+    this.cardEl.addEventListener("pointermove", this.handlePointerMove)
+    this.cardEl.addEventListener("pointerup", this.handlePointerUp)
+    this.cardEl.addEventListener("pointercancel", this.handlePointerUp)
+    this.cardEl.addEventListener("click", this.handleCardClick)
+  },
+
+  unbindCardListeners() {
+    if (!this.cardEl) return
+    this.cardEl.removeEventListener("pointerdown", this.handlePointerDown)
+    this.cardEl.removeEventListener("pointermove", this.handlePointerMove)
+    this.cardEl.removeEventListener("pointerup", this.handlePointerUp)
+    this.cardEl.removeEventListener("pointercancel", this.handlePointerUp)
+    this.cardEl.removeEventListener("click", this.handleCardClick)
+  },
+
+  commitSwipe(direction) {
+    if (!this.cardEl || this.isAnimating) return
+    this.isAnimating = true
+    this.cardEl.classList.remove("swipe-left", "swipe-right")
+    this.cardEl.style.transform = ""
+    this.cardEl.style.opacity = ""
+    this.cardEl.classList.add(direction === "right" ? "swipe-right" : "swipe-left")
+
+    const eventName = direction === "right" ? "right_answer" : "wrong_answer"
+    window.setTimeout(() => {
+      this.pushEvent(eventName, { id: this.flashcardId })
+    }, 300)
+  },
+
+  resetCard() {
+    if (!this.cardEl) return
+    this.isAnimating = false
+    this.cardEl.classList.remove("swipe-left", "swipe-right", "dragging")
+    this.cardEl.style.transform = ""
+    this.cardEl.style.opacity = ""
+  },
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  params: { _csrf_token: csrfToken },
+  hooks: { ...colocatedHooks, FlashcardSwipe },
 })
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
+topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
@@ -53,7 +196,7 @@ window.liveSocket = liveSocket
 //     2. click on elements to jump to their definitions in your code editor
 //
 if (process.env.NODE_ENV === "development") {
-  window.addEventListener("phx:live_reload:attached", ({detail: reloader}) => {
+  window.addEventListener("phx:live_reload:attached", ({ detail: reloader }) => {
     // Enable server log streaming to client.
     // Disable with reloader.disableServerLogs()
     reloader.enableServerLogs()
@@ -66,11 +209,11 @@ if (process.env.NODE_ENV === "development") {
     window.addEventListener("keydown", e => keyDown = e.key)
     window.addEventListener("keyup", e => keyDown = null)
     window.addEventListener("click", e => {
-      if(keyDown === "c"){
+      if (keyDown === "c") {
         e.preventDefault()
         e.stopImmediatePropagation()
         reloader.openEditorAtCaller(e.target)
-      } else if(keyDown === "d"){
+      } else if (keyDown === "d") {
         e.preventDefault()
         e.stopImmediatePropagation()
         reloader.openEditorAtDef(e.target)

@@ -36,9 +36,11 @@ defmodule AtomicWords.Training do
     Repo.one(query)
   end
 
+  @spec flashcards_for_session(any()) :: list()
   def flashcards_for_session(session_id) do
     query =
       from fc in FlashCard,
+        # and is_nil(fc.is_correct),
         where: fc.session_id == ^session_id,
         select: fc
 
@@ -60,22 +62,35 @@ defmodule AtomicWords.Training do
     Repo.all(query)
   end
 
-  def flash_card_answer(flash_card_id, answer) do
+  def flash_card_answer(flash_card_id, true) do
     Repo.get(FlashCard, flash_card_id)
-    |> FlashCard.changeset(%{is_correct: answer})
+    |> FlashCard.changeset(%{is_correct: true})
     |> Repo.update()
   end
 
-  defp create_flashcards_for_session(user_id, session_id) do
-    flash_cards =
-      Dictionary.user_words(user_id)
-      |> Enum.map(fn word ->
-        %FlashCard{}
-        |> FlashCard.changeset(%{word_id: word.id, session_id: session_id})
-      end)
+  def flash_card_answer(flash_card_id, false) do
+    Repo.get(FlashCard, flash_card_id)
+    |> FlashCard.changeset(%{is_correct: false})
+    |> Repo.update()
+    |> case do
+      {:ok, flash_card} ->
+        create_flashcard_for_session(flash_card.word_id, flash_card.session_id)
 
-    Repo.transaction(fn ->
-      Enum.each(flash_cards, &Repo.insert!/1)
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  defp create_flashcards_for_session(user_id, session_id) do
+    Dictionary.user_words(user_id)
+    |> Enum.map(fn word ->
+      create_flashcard_for_session(word.id, session_id)
     end)
+  end
+
+  defp create_flashcard_for_session(word_id, session_id) do
+    %FlashCard{}
+    |> FlashCard.changeset(%{word_id: word_id, session_id: session_id})
+    |> Repo.insert()
   end
 end
