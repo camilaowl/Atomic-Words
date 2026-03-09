@@ -10,20 +10,27 @@ defmodule AtomicWordsWeb.TrainingLive do
       <div class="flex flex-row justify-center w-full h-full my-5">
         <div class="flex flex-col justify-items-center">
           <div class=" basis-3/4 flex justify-center items-center w-full">
-            <%= if @active_session do %>
-              <.live_component
-                module={AtomicWordsWeb.LiveComponents.Training.Flashcards}
-                id="flashcards"
-                current_scope={@current_scope}
-                flash_card={@current_flash_card}
-              />
-            <% else %>
-              <button
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors mb-4"
-                phx-click="start_training"
-              >
-                Start Training
-              </button>
+            <%= cond do %>
+              <% @active_session -> %>
+                <.live_component
+                  module={AtomicWordsWeb.LiveComponents.Training.Flashcards}
+                  id="flashcards"
+                  current_scope={@current_scope}
+                  flash_card={@current_flash_card}
+                  next_flash_card={@next_flash_card}
+                />
+              <% @training_finished -> %>
+                <div class="text-center">
+                  <h2 class="text-2xl font-bold mb-4">No more flashcards to review!</h2>
+                  <p class="text-gray-600 mb-6">You've completed all flashcards for this session.</p>
+                </div>
+              <% true -> %>
+                <button
+                  class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors mb-4"
+                  phx-click="start_training"
+                >
+                  Start Training
+                </button>
             <% end %>
           </div>
           <%= if @active_session do %>
@@ -44,15 +51,15 @@ defmodule AtomicWordsWeb.TrainingLive do
   def mount(_params, _session, socket) do
     active_session = Training.active_session_for_user(socket.assigns.current_scope.user.id)
 
-    cards =
-      if active_session, do: Training.flashcards_for_session(active_session.id), else: []
-
-    # current = Enum.find(cards, nil, &is_nil(&1.is_correct))
-    # next_card = Enum.at(cards, Enum.find_index(cards, current) + 1)
+    if connected?(socket) do
+      user_id = socket.assigns.current_scope.user.id
+      Phoenix.PubSub.subscribe(AtomicWords.PubSub, "training:#{user_id}")
+    end
 
     socket =
       socket
       |> assign(:active_session, active_session)
+      |> assign(:training_finished, false)
       |> assign_current_and_next_flash_cards()
 
     {:ok, socket}
@@ -67,7 +74,6 @@ defmodule AtomicWordsWeb.TrainingLive do
         socket =
           socket
           |> assign(:active_session, session)
-          # |> assign(:flash_cards, flash_cards)
           |> assign_current_and_next_flash_cards()
 
         {:noreply, socket}
@@ -75,6 +81,11 @@ defmodule AtomicWordsWeb.TrainingLive do
       {:error, _changeset} ->
         {:noreply, socket}
     end
+  end
+
+  @impl true
+  def handle_info({:training_finished, _}, socket) do
+    {:noreply, assign(socket, :training_finished, true)}
   end
 
   @impl true
@@ -112,12 +123,34 @@ defmodule AtomicWordsWeb.TrainingLive do
   end
 
   defp assign_current_and_next_flash_cards(socket) do
-    {current_card, next_card} =
-      Training.current_and_next_flash_cards(socket.assigns.active_session.id)
+    case socket.assigns.active_session do
+      nil ->
+        socket
+        |> assign(:current_flash_card, nil)
+        |> assign(:next_flash_card, nil)
 
-    socket
-    |> assign(:active_session, socket.assigns.active_session)
-    |> assign(:current_flash_card, current_card)
-    |> assign(:next_flash_card, next_card)
+      active_session ->
+        user_id = socket.assigns.current_scope.user.id
+        {current_card, next_card} = Training.current_and_next_flash_cards(active_session.id)
+
+        if is_nil(current_card) do
+          {:ok, _} = Training.complete_training(active_session.id, user_id)
+
+          Phoenix.PubSub.broadcast(
+            AtomicWords.PubSub,
+            "training:#{user_id}",
+            {:training_finished, active_session.id}
+          )
+
+          socket
+          |> assign(:active_session, nil)
+          |> assign(:current_flash_card, nil)
+          |> assign(:next_flash_card, nil)
+        else
+          socket
+          |> assign(:current_flash_card, current_card)
+          |> assign(:next_flash_card, next_card)
+        end
+    end
   end
 end

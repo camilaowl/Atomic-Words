@@ -69,13 +69,12 @@ defmodule AtomicWords.Training do
     {current_card, next_card}
   end
 
-  def test(session_id) do
+  def all_flashcards_answered?(session_id) do
     query =
       from fc in FlashCard,
-        where: fc.session_id == ^session_id,
-        select: fc
+        where: fc.session_id == ^session_id and is_nil(fc.is_correct)
 
-    Repo.all(query)
+    Repo.all(query) == []
   end
 
   def flash_card_answer(flash_card_id, true) do
@@ -109,7 +108,5 @@ defmodule AtomicWords.Training do
   defp flashcard_changeset_for_session(word_id, session_id) do
     %FlashCard{}
     |> FlashCard.changeset(%{word_id: word_id, session_id: session_id, is_correct: nil})
-
-    # |> Ecto.Changeset.put_change(:is_correct, nil)
   end
 end
