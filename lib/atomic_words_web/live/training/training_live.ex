@@ -9,12 +9,6 @@ defmodule AtomicWordsWeb.TrainingLive do
     <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:training}>
       <div class="flex flex-row justify-center w-full h-full my-5">
         <div class="flex flex-col justify-items-center">
-          <div class=" basis-1/4 flex flex-row items-center justify-between w-full my-2 gap-x-2">
-            <div class="flex rounded-lg outline outline-black/10 dark:bg-grey-600 dark:shadow-none dark:-outline-offset-1 dark:outline-white/5 p-4">
-              <h1 class="text-xl font-bold mb-4">My dictionary</h1>
-            </div>
-          </div>
-
           <div class=" basis-3/4 flex justify-center items-center w-full">
             <%= if @active_session do %>
               <.live_component
@@ -59,9 +53,7 @@ defmodule AtomicWordsWeb.TrainingLive do
     socket =
       socket
       |> assign(:active_session, active_session)
-      |> assign(:current_flash_card, List.first(cards))
-
-    # |> assign(:next_flash_card, next_card)
+      |> assign_current_and_next_flash_cards()
 
     {:ok, socket}
   end
@@ -72,13 +64,11 @@ defmodule AtomicWordsWeb.TrainingLive do
 
     case Training.start_training(user_id) do
       {:ok, session} ->
-        [current, _] = Training.flashcards_for_session(session.id)
-
         socket =
           socket
           |> assign(:active_session, session)
           # |> assign(:flash_cards, flash_cards)
-          |> assign(:current_flash_card, current)
+          |> assign_current_and_next_flash_cards()
 
         {:noreply, socket}
 
@@ -97,8 +87,8 @@ defmodule AtomicWordsWeb.TrainingLive do
         socket =
           socket
           |> assign(:active_session, nil)
-          # |> assign(:flash_cards, [])
           |> assign(:current_flash_card, nil)
+          |> assign(:next_flash_card, nil)
 
         {:noreply, socket}
 
@@ -110,12 +100,24 @@ defmodule AtomicWordsWeb.TrainingLive do
   @impl true
   def handle_event("wrong_answer", %{"id" => id}, socket) do
     Training.flash_card_answer(id, false)
-    {:noreply, socket}
+
+    {:noreply, assign_current_and_next_flash_cards(socket)}
   end
 
   @impl true
   def handle_event("right_answer", %{"id" => id}, socket) do
     Training.flash_card_answer(id, true)
-    {:noreply, socket}
+
+    {:noreply, assign_current_and_next_flash_cards(socket)}
+  end
+
+  defp assign_current_and_next_flash_cards(socket) do
+    {current_card, next_card} =
+      Training.current_and_next_flash_cards(socket.assigns.active_session.id)
+
+    socket
+    |> assign(:active_session, socket.assigns.active_session)
+    |> assign(:current_flash_card, current_card)
+    |> assign(:next_flash_card, next_card)
   end
 end

@@ -27,7 +27,7 @@ import topbar from "../vendor/topbar"
 
 const FlashcardSwipe = {
   mounted() {
-    this.cardEl = this.el.querySelector(".flashcard")
+    this.cardEl = this.el.querySelector(".flashcard-current")
     this.actionButtons = this.el.querySelectorAll("[data-flashcard-action]")
     this.flashcardId = this.el.dataset.flashcardId
     this.isAnimating = false
@@ -100,7 +100,7 @@ const FlashcardSwipe = {
   },
 
   updated() {
-    const nextCardEl = this.el.querySelector(".flashcard")
+    const nextCardEl = this.el.querySelector(".flashcard-current")
     if (nextCardEl !== this.cardEl) {
       this.unbindCardListeners()
       this.cardEl = nextCardEl
