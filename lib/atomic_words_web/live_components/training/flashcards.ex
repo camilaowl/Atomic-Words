@@ -10,7 +10,7 @@ defmodule AtomicWordsWeb.LiveComponents.Training.Flashcards do
     ~H"""
     <div class="flex flex-row w-full justify-center">
       <div class="w-full">
-        <div class="flex flex-col gap-8 items-center justify-center">
+        <div class="flex flex-col gap-8 justify-center">
           <div class="flashcard-stack w-full h-96">
             <%= if @next_flash_card do %>
               <div class="flashcard flashcard-next">
@@ -60,23 +60,6 @@ defmodule AtomicWordsWeb.LiveComponents.Training.Flashcards do
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="flex flex-row gap-8 items-center justify-center">
-            <.button
-              class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mb-4"
-              data-flashcard-action="left"
-              type="button"
-            >
-              Wrong answer
-            </.button>
-            <.button
-              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors mb-4"
-              data-flashcard-action="right"
-              type="button"
-            >
-              Right answer
-            </.button>
           </div>
         </div>
       </div>
