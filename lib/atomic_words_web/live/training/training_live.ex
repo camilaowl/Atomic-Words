@@ -69,8 +69,10 @@ defmodule AtomicWordsWeb.TrainingLive do
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(%{"mode" => mode, "limit" => limit}, _session, socket) do
     active_session = Training.active_session_for_user(socket.assigns.current_scope.user.id)
+
+    start_training(mode, limit, socket)
 
     if connected?(socket) do
       user_id = socket.assigns.current_scope.user.id
@@ -86,11 +88,10 @@ defmodule AtomicWordsWeb.TrainingLive do
     {:ok, socket}
   end
 
-  @impl true
-  def handle_event("start_training", _params, socket) do
+  defp start_training(mode, limit, socket) do
     user_id = socket.assigns.current_scope.user.id
 
-    case Training.start_training(user_id) do
+    case Training.start_training_with_mode(mode, limit, user_id) do
       {:ok, session} ->
         socket =
           socket

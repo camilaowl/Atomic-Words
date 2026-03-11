@@ -61,7 +61,7 @@ defmodule AtomicWordsWeb.Router do
       live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/", HomeLive
       live "/training", TrainingLive
-      #live "/training_mode", TrainingModeLive
+      live "/training_mode", TrainingModeLive
       live "/words", WordsLive
       live "/stats", StatisticsLive
       live "/statistics", StatisticsLive

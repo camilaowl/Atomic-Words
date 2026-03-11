@@ -128,7 +128,7 @@ defmodule AtomicWordsWeb.Layouts do
         class={
             "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :training, do: "bg-gray-200", else: "hover:bg-gray-50"}"
           }
-        navigate={~p"/training"}
+        navigate={~p"/training_mode"}
       >
         <.icon name="hero-fire" class="size-4 inline-block mr-2" /> Training
       </.link>

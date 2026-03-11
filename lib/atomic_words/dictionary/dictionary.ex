@@ -82,6 +82,11 @@ defmodule AtomicWords.Dictionary do
     for word <- Repo.all(query), do: word_with_translations(word)
   end
 
+  def random_words(limit) do
+    query = from w in Word, order_by: fragment("RANDOM()"), limit: ^limit
+    for word <- Repo.all(query), do: word_with_translations(word)
+  end
+
   def user_words_ids(user_id) do
     query =
       from uw in UserWords,

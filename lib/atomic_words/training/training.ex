@@ -12,13 +12,51 @@ defmodule AtomicWords.Training do
     |> Repo.insert()
     |> case do
       {:ok, session} ->
-        create_flashcards_for_session(user_id, session.id)
+        create_flashcards_for_session(Dictionary.user_words(user_id), session.id)
         {:ok, session}
 
       {:error, changeset} ->
         {:error, changeset}
     end
   end
+
+  def start_training_with_mode("my_words", limit, user_id) do
+    %Session{}
+    |> Session.changeset(%{user_id: user_id, completed_at: nil}, user_id)
+    |> Repo.insert()
+    |> case do
+      {:ok, session} ->
+        user_words = Dictionary.user_words(user_id)
+        user_words_with_limit = take_random(user_words, limit)
+        create_flashcards_for_session(user_words_with_limit, session.id)
+        {:ok, session}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  def start_training_with_mode("difficult", limit, user_id),
+    do: start_training_with_mode("my_words", limit, user_id)
+
+  def start_training_with_mode("random", limit, user_id) do
+    %Session{}
+    |> Session.changeset(%{user_id: user_id, completed_at: nil}, user_id)
+    |> Repo.insert()
+    |> case do
+      {:ok, session} ->
+        create_flashcards_for_session(Dictionary.random_words(limit), session.id)
+        {:ok, session}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  def start_training_with_mode(_mode, _limit, user_id), do: start_training(user_id)
+
+  defp take_random(list, nil), do: Enum.shuffle(list)
+  defp take_random(list, limit), do: Enum.take_random(list, limit)
 
   def complete_training(session_id, user_id) do
     Repo.get(Session, session_id)
@@ -97,9 +135,8 @@ defmodule AtomicWords.Training do
     end
   end
 
-  defp create_flashcards_for_session(user_id, session_id) do
-    Dictionary.user_words(user_id)
-    |> Enum.map(fn word ->
+  defp create_flashcards_for_session(word_list, session_id) do
+    Enum.map(word_list, fn word ->
       flashcard_changeset_for_session(word.id, session_id)
       |> Repo.insert()
     end)
