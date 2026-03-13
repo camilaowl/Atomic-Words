@@ -99,7 +99,8 @@ defmodule AtomicWords.Training do
   def current_and_next_flash_cards(session_id) do
     query =
       from fc in FlashCard,
-        where: fc.session_id == ^session_id and is_nil(fc.is_correct)
+        where: fc.session_id == ^session_id and is_nil(fc.is_correct),
+        order_by: [asc: fc.inserted_at, asc: fc.id]
 
     flash_cards =
       for flash_card <- Repo.all(query) do
