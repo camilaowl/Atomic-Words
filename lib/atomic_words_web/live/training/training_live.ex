@@ -7,8 +7,18 @@ defmodule AtomicWordsWeb.TrainingLive do
   def render(assigns) do
     ~H"""
     <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:training}>
-      <div class="flex flex-col items-center justify-center w-full my-5">
-        <div class="w-full max-w-3xl ">
+      <div class="flex flex-col items-center justify-center w-full">
+        <div class="w-full">
+          <button
+            class="mb-6 ml-4 inline-flex items-center gap-2 text-sm text-slate-700 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/60 focus-visible:ring-offset-2 !bg-transparent !p-0 !rounded-none !border-0 hover:!bg-transparent"
+            phx-click="navigate_back"
+          >
+            <.icon name="hero-arrow-left" class="w-4 h-4" />
+            <span>Back to training modes</span>
+          </button>
+        </div>
+
+        <div class="w-full max-w-3xl  my-5">
           <div class="flex flex-row items-center gap-4 w-full">
             <%= cond do %>
               <% @active_session -> %>
@@ -123,7 +133,7 @@ defmodule AtomicWordsWeb.TrainingLive do
           |> assign(:current_flash_card, nil)
           |> assign(:next_flash_card, nil)
 
-        {:noreply, socket}
+        {:noreply, push_navigate(socket, to: ~p"/training_mode")}
 
       {:error, _changeset} ->
         {:noreply, socket}
@@ -142,6 +152,11 @@ defmodule AtomicWordsWeb.TrainingLive do
     Training.flash_card_answer(id, true)
 
     {:noreply, assign_current_and_next_flash_cards(socket)}
+  end
+
+  @impl true
+  def handle_event("navigate_back", _params, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/training_mode")}
   end
 
   defp assign_current_and_next_flash_cards(socket) do

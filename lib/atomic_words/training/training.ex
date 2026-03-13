@@ -55,7 +55,13 @@ defmodule AtomicWords.Training do
 
   def start_training_with_mode(_mode, _limit, user_id), do: start_training(user_id)
 
-  defp take_random(list, nil), do: Enum.shuffle(list)
+  defp take_random(list, limit) when is_binary(limit) do
+    case Integer.parse(limit) do
+      {int, _} when int > 0 -> Enum.take_random(list, int)
+      _ -> Enum.shuffle(list)
+    end
+  end
+
   defp take_random(list, limit), do: Enum.take_random(list, limit)
 
   def complete_training(session_id, user_id) do

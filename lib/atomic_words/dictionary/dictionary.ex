@@ -83,7 +83,7 @@ defmodule AtomicWords.Dictionary do
   end
 
   def random_words(limit) do
-    query = from w in Word, order_by: fragment("RANDOM()"), limit: ^limit
+    query = from w in Word, where: w.lang == "en", order_by: fragment("RANDOM()"), limit: ^limit
     for word <- Repo.all(query), do: word_with_translations(word)
   end
 

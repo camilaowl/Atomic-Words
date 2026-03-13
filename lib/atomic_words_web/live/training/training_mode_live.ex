@@ -12,16 +12,16 @@ defmodule AtomicWordsWeb.TrainingModeLive do
             id="training-mode-my-words"
             current_scope={@current_scope}
             mode_name="My words"
-            ,
             mode_value="my_words"
+            limits={[15, 30, "all"]}
           />
           <.live_component
             module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
             id="training-mode-difficult"
             current_scope={@current_scope}
             mode_name="Difficult words"
-            ,
             mode_value="difficult"
+            limits={[15, 30, 45]}
           />
 
           <.live_component
@@ -29,8 +29,8 @@ defmodule AtomicWordsWeb.TrainingModeLive do
             id="training-mode-random"
             current_scope={@current_scope}
             mode_name="Random"
-            ,
             mode_value="random"
+            limits={[15, 30, 45]}
           />
         </div>
       </div>
@@ -48,7 +48,7 @@ defmodule AtomicWordsWeb.TrainingModeLive do
           {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("start_training", value, socket) do
     mode = value["mode"] || "my_words"
-    limit = value["limit"] || "15"
+    limit = value["limit"] || 15
     {:noreply, push_navigate(socket, to: ~p"/training?#{%{mode: mode, limit: limit}}")}
   end
 end

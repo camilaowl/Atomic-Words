@@ -4,6 +4,7 @@ defmodule AtomicWordsWeb.LiveComponents.Training.TrainingMode do
   attr :current_scope, :any, required: true
   attr :mode_name, :string, required: true
   attr :mode_value, :string, required: true
+  attr :limits, :list, default: [15, 30, 45]
 
   @impl true
   def render(assigns) do
@@ -15,27 +16,27 @@ defmodule AtomicWordsWeb.LiveComponents.Training.TrainingMode do
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-blue-600 transition-colors mb-4"
           phx-click="start_training"
           phx-value-mode={@mode_value}
-          phx-value-limit="15"
+          phx-value-limit={Enum.at(@limits, 0)}
         >
-          15
+          {Enum.at(@limits, 0)}
         </button>
 
         <button
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-blue-600 transition-colors mb-4"
           phx-click="start_training"
           phx-value-mode={@mode_value}
-          phx-value-limit="30"
+          phx-value-limit={Enum.at(@limits, 1)}
         >
-          30
+          {Enum.at(@limits, 1)}
         </button>
 
         <button
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-blue-600 transition-colors mb-4"
           phx-click="start_training"
           phx-value-mode={@mode_value}
-          phx-value-limit="all"
+          phx-value-limit={Enum.at(@limits, 2)}
         >
-          All
+          {Enum.at(@limits, 2)}
         </button>
       </div>
     </div>
