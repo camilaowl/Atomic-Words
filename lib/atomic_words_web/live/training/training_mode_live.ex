@@ -1,38 +1,54 @@
 defmodule AtomicWordsWeb.TrainingModeLive do
   use AtomicWordsWeb, :live_view
+
+  alias AtomicWords.Training
   @impl true
   def render(assigns) do
     ~H"""
     <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:training}>
-      <div class="flex flex-col items-left w-full h-full gap-6 p-6">
-        <h2 class="text-2xl font-bold ">Training Modes:</h2>
-        <div class=" flex flex-row items-center my-2 gap-x-2">
-          <.live_component
-            module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
-            id="training-mode-my-words"
-            current_scope={@current_scope}
-            mode_name="My words"
-            mode_value="my_words"
-            limits={[15, 30, "all"]}
-          />
-          <.live_component
-            module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
-            id="training-mode-difficult"
-            current_scope={@current_scope}
-            mode_name="Difficult words"
-            mode_value="difficult"
-            limits={[15, 30, 45]}
-          />
+      <div class="w-full h-full flex flex-col items-center justify-center">
+        <div class="flex flex-col items-left w-full h-full gap-6 p-6">
+          <h2 class="text-2xl font-bold ">Choose Training Modes:</h2>
+          <div class=" flex flex-row items-center my-2 gap-x-2">
+            <.live_component
+              module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
+              id="training-mode-my-words"
+              current_scope={@current_scope}
+              mode_name="My words"
+              mode_value="my_words"
+              limits={[15, 30, "all"]}
+            />
+            <.live_component
+              module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
+              id="training-mode-difficult"
+              current_scope={@current_scope}
+              mode_name="Difficult words"
+              mode_value="difficult"
+              limits={[15, 30, 45]}
+            />
 
-          <.live_component
-            module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
-            id="training-mode-random"
-            current_scope={@current_scope}
-            mode_name="Random"
-            mode_value="random"
-            limits={[15, 30, 45]}
-          />
+            <.live_component
+              module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
+              id="training-mode-random"
+              current_scope={@current_scope}
+              mode_name="Random"
+              mode_value="random"
+              limits={[15, 30, 45]}
+            />
+          </div>
         </div>
+
+        <%= if @active_session do %>
+          <div class="flex flex-col items-center w-full h-full justify-center">
+            <p class="text-xl font-bold mb-4">Or continue your current training session:</p>
+            <button
+              class=""
+              phx-click="continue_training"
+            >
+              Continue Training
+            </button>
+          </div>
+        <% end %>
       </div>
     </Layouts.app>
     """
@@ -40,6 +56,13 @@ defmodule AtomicWordsWeb.TrainingModeLive do
 
   @impl true
   def mount(_params, _session, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    active_session = Training.active_session_for_user(user_id)
+
+    socket =
+      socket
+      |> assign(:active_session, active_session)
+
     {:ok, socket}
   end
 
@@ -50,5 +73,10 @@ defmodule AtomicWordsWeb.TrainingModeLive do
     mode = value["mode"] || "my_words"
     limit = value["limit"] || 15
     {:noreply, push_navigate(socket, to: ~p"/training?#{%{mode: mode, limit: limit}}")}
+  end
+
+  @impl true
+  def handle_event("continue_training", _params, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/training?resume=true")}
   end
 end

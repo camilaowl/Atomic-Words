@@ -79,39 +79,70 @@ defmodule AtomicWordsWeb.TrainingLive do
   end
 
   @impl true
-  def mount(%{"mode" => mode, "limit" => limit}, _session, socket) do
-    active_session = Training.active_session_for_user(socket.assigns.current_scope.user.id)
-
-    start_training(mode, limit, socket)
-
-    if connected?(socket) do
-      user_id = socket.assigns.current_scope.user.id
-      Phoenix.PubSub.subscribe(AtomicWords.PubSub, "training:#{user_id}")
-    end
+  def mount(%{"resume" => _}, _session, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    active_session = Training.active_session_for_user(user_id)
 
     socket =
       socket
-      |> assign(:active_session, active_session)
       |> assign(:training_finished, false)
-      |> assign_current_and_next_flash_cards()
+      |> assign(:active_session, active_session)
 
-    {:ok, socket}
+    subscribe_to_training_updates(socket)
+
+    {:ok, assign_current_and_next_flash_cards(socket)}
   end
 
-  defp start_training(mode, limit, socket) do
+  @impl true
+  def mount(%{"mode" => mode, "limit" => limit}, _session, socket) do
+    socket =
+      socket
+      |> assign(:training_finished, false)
+      |> start_training_with_mode(mode, limit)
+
+    subscribe_to_training_updates(socket)
+
+    {:ok, assign_current_and_next_flash_cards(socket)}
+  end
+
+  @impl true
+  def mount(_params, _session, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    active_session = Training.active_session_for_user(user_id)
+
+    socket =
+      socket
+      |> assign(:training_finished, false)
+      |> assign(:active_session, active_session)
+
+    socket =
+      if active_session do
+        socket
+      else
+        start_training_with_mode(socket, "my_words", 15)
+      end
+
+    subscribe_to_training_updates(socket)
+
+    {:ok, assign_current_and_next_flash_cards(socket)}
+  end
+
+  defp start_training_with_mode(socket, mode, limit) do
     user_id = socket.assigns.current_scope.user.id
 
     case Training.start_training_with_mode(mode, limit, user_id) do
       {:ok, session} ->
-        socket =
-          socket
-          |> assign(:active_session, session)
-          |> assign_current_and_next_flash_cards()
-
-        {:noreply, socket}
+        assign(socket, :active_session, session)
 
       {:error, _changeset} ->
-        {:noreply, socket}
+        assign(socket, :active_session, nil)
+    end
+  end
+
+  defp subscribe_to_training_updates(socket) do
+    if connected?(socket) do
+      user_id = socket.assigns.current_scope.user.id
+      Phoenix.PubSub.subscribe(AtomicWords.PubSub, "training:#{user_id}")
     end
   end
 
