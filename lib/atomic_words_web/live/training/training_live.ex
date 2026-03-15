@@ -79,26 +79,13 @@ defmodule AtomicWordsWeb.TrainingLive do
   end
 
   @impl true
-  def mount(%{"resume" => _}, _session, socket) do
-    user_id = socket.assigns.current_scope.user.id
-    active_session = Training.active_session_for_user(user_id)
+  def mount(%{"session_id" => session_id}, _session, socket) do
+    session = Training.session_by_id(session_id)
 
     socket =
       socket
       |> assign(:training_finished, false)
-      |> assign(:active_session, active_session)
-
-    subscribe_to_training_updates(socket)
-
-    {:ok, assign_current_and_next_flash_cards(socket)}
-  end
-
-  @impl true
-  def mount(%{"mode" => mode, "limit" => limit}, _session, socket) do
-    socket =
-      socket
-      |> assign(:training_finished, false)
-      |> start_training_with_mode(mode, limit)
+      |> assign(:active_session, session)
 
     subscribe_to_training_updates(socket)
 

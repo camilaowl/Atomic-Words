@@ -1,3 +1,16 @@
+<%= if assigns[:active_session] do %>
+  <div
+    id="training-continue-bubble"
+    class="fixed bottom-6 right-6 z-50"
+  >
+    <.live_component
+      module={AtomicWordsWeb.Training.ActiveSessionBubble}
+      id="training-continue-bubble-component"
+      session_id={assigns.active_session.id}
+    />
+  </div>
+<% end %>
+
 <div class="container mx-auto flex h-screen">
   <div class="flex flex-col w-72 h-full border-r border-gray-200 pt-5 pb-4 bg-gray-100 pr-4">
     <nav class="pl-4">

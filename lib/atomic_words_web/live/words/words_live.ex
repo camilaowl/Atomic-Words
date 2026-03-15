@@ -3,7 +3,12 @@ defmodule AtomicWordsWeb.WordsLive do
 
   def render(assigns) do
     ~H"""
-    <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:words}>
+    <Layouts.app
+      current_scope={@current_scope}
+      flash={@flash}
+      active_tab={:words}
+      active_session={@active_session}
+    >
       <div class="flex flex-row justify-center w-full">
         <p class="text-center text-xl">Words Live View</p>
       </div>

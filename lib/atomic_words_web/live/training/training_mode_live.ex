@@ -5,10 +5,15 @@ defmodule AtomicWordsWeb.TrainingModeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:training}>
+    <Layouts.app
+      current_scope={@current_scope}
+      flash={@flash}
+      active_tab={:training}
+      active_session={@active_session}
+    >
       <div class="w-full h-full flex flex-col items-center justify-center">
         <div class="flex flex-col items-left w-full h-full gap-6 p-6">
-          <h2 class="text-2xl font-bold ">Choose Training Modes:</h2>
+          <h2 class="text-2xl font-bold ">Choose Training Mode:</h2>
           <div class=" flex flex-row items-center my-2 gap-x-2">
             <.live_component
               module={AtomicWordsWeb.LiveComponents.Training.TrainingMode}
@@ -37,18 +42,6 @@ defmodule AtomicWordsWeb.TrainingModeLive do
             />
           </div>
         </div>
-
-        <%= if @active_session do %>
-          <div class="flex flex-col items-center w-full h-full justify-center">
-            <p class="text-xl font-bold mb-4">Or continue your current training session:</p>
-            <button
-              class=""
-              phx-click="continue_training"
-            >
-              Continue Training
-            </button>
-          </div>
-        <% end %>
       </div>
     </Layouts.app>
     """
@@ -67,12 +60,22 @@ defmodule AtomicWordsWeb.TrainingModeLive do
   end
 
   @impl true
-  @spec handle_event(<<_::88>>, any(), Phoenix.LiveView.Socket.t()) ::
-          {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("start_training", value, socket) do
+    user_id = socket.assigns.current_scope.user.id
     mode = value["mode"] || "my_words"
     limit = value["limit"] || 15
-    {:noreply, push_navigate(socket, to: ~p"/training?#{%{mode: mode, limit: limit}}")}
+
+    case Training.start_training_with_mode(mode, limit, user_id) do
+      {:ok, session} ->
+        socket =
+          socket
+          |> assign(:active_session, session)
+
+        {:noreply, push_navigate(socket, to: ~p"/training?#{%{session_id: session.id}}")}
+
+      {:error, _changeset} ->
+        {:noreply, assign(socket, :active_session, nil)}
+    end
   end
 
   @impl true

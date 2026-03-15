@@ -80,6 +80,10 @@ defmodule AtomicWords.Training do
     Repo.one(query)
   end
 
+  def session_by_id(session_id) do
+    Repo.get(Session, session_id)
+  end
+
   @spec flashcards_for_session(any()) :: list()
   def flashcards_for_session(session_id) do
     query =

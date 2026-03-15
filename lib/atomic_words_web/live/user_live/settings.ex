@@ -8,7 +8,12 @@ defmodule AtomicWordsWeb.UserLive.Settings do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app flash={@flash} current_scope={@current_scope} active_tab={:settings}>
+    <Layouts.app
+      flash={@flash}
+      current_scope={@current_scope}
+      active_tab={:settings}
+      active_session={@active_session}
+    >
       <div class="text-center">
         <.header>
           Account Settings

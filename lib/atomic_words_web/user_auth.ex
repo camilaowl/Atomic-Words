@@ -6,6 +6,7 @@ defmodule AtomicWordsWeb.UserAuth do
 
   alias AtomicWords.Accounts
   alias AtomicWords.Accounts.Scope
+  alias AtomicWords.Training
 
   # Make the remember me cookie valid for 14 days. This should match
   # the session validity setting in UserToken.
@@ -33,8 +34,6 @@ defmodule AtomicWordsWeb.UserAuth do
   or falls back to the `signed_in_path/1`.
   """
   def log_in_user(conn, user, params \\ %{}) do
-    #user_return_to = get_session(conn, :user_return_to)
-
     conn
     |> create_or_extend_session(user, params)
     |> redirect(to: signed_in_path(conn))
@@ -219,6 +218,11 @@ defmodule AtomicWordsWeb.UserAuth do
     socket = mount_current_scope(socket, session)
 
     if socket.assigns.current_scope && socket.assigns.current_scope.user do
+      socket =
+        Phoenix.Component.assign_new(socket, :active_session, fn ->
+          Training.active_session_for_user(socket.assigns.current_scope.user.id)
+        end)
+
       {:cont, socket}
     else
       socket =

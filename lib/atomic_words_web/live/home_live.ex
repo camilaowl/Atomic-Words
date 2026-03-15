@@ -7,7 +7,12 @@ defmodule AtomicWordsWeb.HomeLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:home}>
+    <Layouts.app
+      current_scope={@current_scope}
+      flash={@flash}
+      active_tab={:home}
+      active_session={@active_session}
+    >
       <div class="flex flex-row justify-center w-full">
         <div class="flex-col justify-center w-1/2">
           <.live_component
