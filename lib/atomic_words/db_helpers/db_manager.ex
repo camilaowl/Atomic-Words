@@ -1,11 +1,10 @@
 defmodule AtomicWords.DbManager do
-  import Ecto.Query
+  alias AtomicWords.Dictionary.Word
+  alias AtomicWords.Dictionary.WordTranslation
+  alias AtomicWords.Dictionary.UserWords
+  alias AtomicWords.Dictionary
   alias AtomicWords.Translator
   alias AtomicWords.Repo
-  alias AtomicWords.Schema.Word
-  alias AtomicWords.Schema.WordTranslation
-  alias AtomicWords.Schema.UserWords
-  alias AtomicWords.Words
 
   @us_transcriptions_path "priv/static/en_US_transcriptions.txt"
   @uk_transcriptions_path "priv/static/en_UK_transcriptions.txt"
@@ -108,7 +107,7 @@ defmodule AtomicWords.DbManager do
     |> Enum.uniq()
     |> Enum.each(fn word ->
       with {:ok, translated_text} <- Translator.translate(word, @translation_target_lang) do
-        Words.add_translated_word(
+        Dictionary.add_translated_word(
           word,
           translated_text,
           @translation_origin_lang,
@@ -120,7 +119,7 @@ defmodule AtomicWords.DbManager do
             :ok
 
           transcriptions ->
-            Words.add_transcriptions_to_word(
+            Dictionary.add_transcriptions_to_word(
               word,
               transcriptions.uk_transcription,
               transcriptions.us_transcription
@@ -138,7 +137,7 @@ defmodule AtomicWords.DbManager do
           :ok
 
         transcriptions ->
-          Words.add_transcriptions_to_word(
+          Dictionary.add_transcriptions_to_word(
             word.text,
             transcriptions.uk_transcription,
             transcriptions.us_transcription

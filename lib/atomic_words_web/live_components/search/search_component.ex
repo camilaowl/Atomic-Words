@@ -2,7 +2,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   use AtomicWordsWeb, :live_component
 
   import AtomicWordsWeb.CoreComponents
-  alias AtomicWords.Words
+  alias AtomicWords.Dictionary
 
   @impl true
   def render(assigns) do
@@ -101,7 +101,11 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   def handle_event("change", %{"search" => search_query}, socket) do
     if String.length(search_query) > 2 do
       search_results =
-        Words.search_partial(search_query, socket.assigns.origin_lang, socket.assigns.target_lang)
+        Dictionary.search_partial(
+          search_query,
+          socket.assigns.origin_lang,
+          socket.assigns.target_lang
+        )
 
       socket = assign(socket, :search_results, search_results)
       {:noreply, socket}
@@ -128,7 +132,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
     reply_socket =
       case Integer.parse(item_id) do
         {int, _rest} ->
-          case Words.add_user_word(user_id, int) do
+          case Dictionary.add_user_word(user_id, int) do
             {:ok, added_word} ->
               socket = assign(socket, :added_word_ids, load_added_word_ids(user_id))
               send(self(), {:word_added, added_word})
@@ -160,8 +164,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   defp load_added_word_ids(user_id) do
     user_id
-    |> Words.find_user_words_by_user_id()
-    |> Enum.map(& &1.word_id)
+    |> Dictionary.user_words_ids()
     |> MapSet.new()
   end
 end

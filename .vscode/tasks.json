@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Generate migration for flash_cards is_correct",
+			"type": "shell",
+			"command": "mix",
+			"args": [
+				"ecto.gen.migration",
+				"alter_flash_cards_is_correct_nullable"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

@@ -1,4 +1,4 @@
-defmodule AtomicWords.Models.WordModel do
+defmodule AtomicWords.Dictionary.WordViewModel do
   @enforce_keys [:word, :lang, :translations, :translated_lang]
   defstruct [
     :id,
