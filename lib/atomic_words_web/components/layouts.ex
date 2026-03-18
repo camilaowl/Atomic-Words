@@ -58,8 +58,8 @@ defmodule AtomicWordsWeb.Layouts do
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
+    <div class=" flex flex-row items-center rounded-full">
+      <div class="absolute w-1/3 h-fit rounded-full bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
 
       <button
         class="flex p-2 cursor-pointer w-1/3"
@@ -89,8 +89,37 @@ defmodule AtomicWordsWeb.Layouts do
   end
 
   attr :current_user, :any
+  attr :active_tab, :atom, default: :home
 
-  def sidebar_profile_info(assigns) do
+  def topbar_menu(assigns) do
+    ~H"""
+    <div class="fixed z-1 flex flex-row w-full h-fit shadow-md px-4 bg-white">
+      <nav class="flex flex-row items-center justify-between items-justify w-full">
+        <div class="flex items-center">
+          <.link class="flex items-center" navigate={~p"/"}>
+            <.icon name="hero-rocket-launch" class="w-8 h-8 text-purple-600" />
+            <span class="h-8 w-auto text-2xl ml-1 font-bold">
+              Atomic Words
+            </span>
+          </.link>
+        </div>
+
+        <.topbar_nav_links
+          current_user={@current_user}
+          active_tab={@active_tab}
+        />
+        <div class="flex flex-row items-justify-center">
+          <.profile_info current_user={@current_user} />
+          <.theme_toggle class="" />
+        </div>
+      </nav>
+    </div>
+    """
+  end
+
+  attr :current_user, :any
+
+  def profile_info(assigns) do
     ~H"""
     <div class="flex items-center space-x-4 pr-4 my-4">
       <div class="avatar">
@@ -113,9 +142,9 @@ defmodule AtomicWordsWeb.Layouts do
   attr :current_user, :any
   attr :active_tab, :atom, default: :home
 
-  def sidebar_nav_links(assigns) do
+  def topbar_nav_links(assigns) do
     ~H"""
-    <div class="space-y-1">
+    <div class="flex flex-row space-x-2">
       <.link
         class={
             "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :home, do: "bg-gray-200", else: "hover:bg-gray-50"}"
@@ -134,12 +163,13 @@ defmodule AtomicWordsWeb.Layouts do
       </.link>
       <.link
         class={
-            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :settings, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :words, do: "bg-gray-200", else: "hover:bg-gray-50"}"
           }
-        navigate={~p"/users/settings"}
+        navigate={~p"/words"}
       >
-        <.icon name="hero-cog-6-tooth" class="size-4 inline-block mr-2" /> Settings
+        <.icon name="hero-book-open" class="size-4 inline-block mr-2" /> My Dictionary
       </.link>
+
       <.link
         class={
             "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :statistics, do: "bg-gray-200", else: "hover:bg-gray-50"}"
@@ -150,11 +180,11 @@ defmodule AtomicWordsWeb.Layouts do
       </.link>
       <.link
         class={
-            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :words, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :settings, do: "bg-gray-200", else: "hover:bg-gray-50"}"
           }
-        navigate={~p"/words"}
+        navigate={~p"/users/settings"}
       >
-        <.icon name="hero-book-open" class="size-4 inline-block mr-2" /> Words
+        <.icon name="hero-cog-6-tooth" class="size-4 inline-block mr-2" /> Settings
       </.link>
       <.link
         class={
