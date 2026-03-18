@@ -1,4 +1,4 @@
-defmodule AtomicWords.Schema.UserWords do
+defmodule AtomicWords.Dictionary.UserWords do
   use Ecto.Schema
   import Ecto.Changeset
 

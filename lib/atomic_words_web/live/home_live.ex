@@ -2,11 +2,17 @@ defmodule AtomicWordsWeb.HomeLive do
   use AtomicWordsWeb, :live_view
 
   # import AtomicWordsWeb.CoreComponents
-  alias AtomicWords.Words
+  alias AtomicWords.Dictionary
 
+  @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.app current_scope={@current_scope} flash={@flash} active_tab={:home}>
+    <Layouts.app
+      current_scope={@current_scope}
+      flash={@flash}
+      active_tab={:home}
+      active_session={@active_session}
+    >
       <div class="flex flex-row justify-center w-full">
         <div class="flex-col justify-center w-1/2">
           <.live_component
@@ -42,7 +48,7 @@ defmodule AtomicWordsWeb.HomeLive do
 
     %{user: %{id: user_id}} = socket.assigns.current_scope
 
-    last_added = Words.last_added_user_words(user_id)
+    last_added = Dictionary.last_added_user_words(user_id)
 
     socket =
       socket
@@ -58,7 +64,7 @@ defmodule AtomicWordsWeb.HomeLive do
   @impl true
   def handle_info({:word_added, _added_word}, socket) do
     %{user: %{id: user_id}} = socket.assigns.current_scope
-    last_added = Words.last_added_user_words(user_id)
+    last_added = Dictionary.last_added_user_words(user_id)
 
     socket =
       socket
@@ -70,7 +76,7 @@ defmodule AtomicWordsWeb.HomeLive do
   @impl true
   def handle_info({:word_deleted, _id}, socket) do
     %{user: %{id: user_id}} = socket.assigns.current_scope
-    last_added = Words.last_added_user_words(user_id)
+    last_added = Dictionary.last_added_user_words(user_id)
 
     socket = assign(socket, :last_added, last_added)
 

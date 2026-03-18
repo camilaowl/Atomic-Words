@@ -96,10 +96,10 @@ defmodule AtomicWordsWeb.Layouts do
       <div class="avatar">
         <div class="w-12 rounded-full">
           <img
-                src="/images/avatar.svg"
-                alt="User Avatar"
-                class="size-12"
-              />
+            src="/images/avatar.svg"
+            alt="User Avatar"
+            class="size-12"
+          />
         </div>
       </div>
       <div>
@@ -123,6 +123,14 @@ defmodule AtomicWordsWeb.Layouts do
         navigate={~p"/"}
       >
         <.icon name="hero-home" class="size-4 inline-block mr-2" /> Home
+      </.link>
+      <.link
+        class={
+            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :training, do: "bg-gray-200", else: "hover:bg-gray-50"}"
+          }
+        navigate={~p"/training_mode"}
+      >
+        <.icon name="hero-fire" class="size-4 inline-block mr-2" /> Training
       </.link>
       <.link
         class={
