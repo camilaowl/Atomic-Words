@@ -62,6 +62,19 @@ defmodule AtomicWords.Training do
     end
   end
 
+  def abandon_active_session(user_id) do
+    query =
+      from s in Session,
+        where: s.user_id == ^user_id and is_nil(s.completed_at),
+        order_by: [desc: s.inserted_at],
+        limit: 1
+
+    case Repo.one(query) do
+      nil -> :ok
+      session -> complete_training(session.id, user_id)
+    end
+  end
+
   defp take_random(list, limit), do: Enum.take_random(list, limit)
 
   def complete_training(session_id, user_id) do

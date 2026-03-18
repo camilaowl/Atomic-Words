@@ -65,6 +65,12 @@ defmodule AtomicWordsWeb.TrainingModeLive do
     mode = value["mode"] || "my_words"
     limit = value["limit"] || 15
 
+    # need to abandon active session if it exists. need to add "abandon"
+    # functionality and a field to db table to mark session as abandoned.
+    # for now, just automatically mark the old one as completed
+
+    Training.abandon_active_session(user_id)
+
     case Training.start_training_with_mode(mode, limit, user_id) do
       {:ok, session} ->
         socket =
@@ -76,10 +82,5 @@ defmodule AtomicWordsWeb.TrainingModeLive do
       {:error, _changeset} ->
         {:noreply, assign(socket, :active_session, nil)}
     end
-  end
-
-  @impl true
-  def handle_event("continue_training", _params, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/training?resume=true")}
   end
 end
