@@ -17,6 +17,17 @@ defmodule AtomicWords.Dictionary do
     end
   end
 
+  def search_partial_in_user_words(input, user_id) do
+    query =
+      from w in Word,
+        join: uw in UserWords,
+        on: uw.word_id == w.id,
+        where: uw.user_id == ^user_id and ilike(w.text, ^"%#{input}%"),
+        select: w
+
+    for word <- Repo.all(query), do: word_with_translations(word)
+  end
+
   def fetch_and_add_word(input, original_lang, target_lang) do
     case DictionaryClient.valid_word(input) do
       {:found, _body} ->
