@@ -11,10 +11,10 @@ defmodule AtomicWordsWeb.WordsLive do
       active_tab={:words}
       active_session={@active_session}
     >
-      <div class="flex flex-col items-center justify-center">
+      <div class="flex flex-col items-center justify-center gap-y-6">
         <div
           id="form"
-          class="related w-1/2 h-fit mb-6 rounded-lg p-1 outline outline-black/5 dark:bg-grey-600 dark:shadow-none dark:-outline-offset-1 dark:outline-white/5 "
+          class="related w-1/2 h-fit rounded-lg p-1 outline outline-black/5 dark:bg-grey-600 dark:shadow-none dark:-outline-offset-1 dark:outline-white/5 "
         >
           <form
             phx-change="change"
@@ -40,6 +40,38 @@ defmodule AtomicWordsWeb.WordsLive do
             </button>
           </form>
         </div>
+        <div id="filter" class="w-1/2 h-fit flex flex-row gap-x-2">
+          <span
+            phx-click="filter"
+            phx-value-filter="all"
+            class={[
+              "mr-4 border-1 border-orange-500 rounded-lg p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+              @selected_filter == :all && "bg-orange-500 text-white"
+            ]}
+          >
+            All
+          </span>
+          <span
+            phx-click="filter"
+            phx-value-filter="new"
+            class={[
+              "mr-4 border-1 border-orange-500 rounded-lg p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+              @selected_filter == :new && "bg-orange-500 text-white"
+            ]}
+          >
+            New
+          </span>
+          <span
+            phx-click="filter"
+            phx-value-filter="difficult"
+            class={[
+              "mr-4 border-1 border-orange-500 rounded-lg p-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors",
+              @selected_filter == :difficult && "bg-orange-500 text-white"
+            ]}
+          >
+            Difficult
+          </span>
+        </div>
         <div id="words-list" class="w-1/2">
           <.live_component
             module={AtomicWordsWeb.LiveComponents.Words.WordList}
@@ -61,6 +93,7 @@ defmodule AtomicWordsWeb.WordsLive do
     socket =
       socket
       |> assign(:words, words)
+      |> assign(:selected_filter, :all)
 
     {:ok, socket}
   end
@@ -100,5 +133,19 @@ defmodule AtomicWordsWeb.WordsLive do
       |> assign(:words, words)
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("filter", %{"filter" => filter_value}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    {selected_filter, words} =
+      case filter_value do
+        "new" -> {:new, Dictionary.user_words(user_id)}
+        "difficult" -> {:difficult, Dictionary.user_words(user_id)}
+        _ -> {:all, Dictionary.user_words(user_id)}
+      end
+
+    {:noreply, assign(socket, selected_filter: selected_filter, words: words)}
   end
 end
