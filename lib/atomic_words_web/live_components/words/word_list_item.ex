@@ -20,13 +20,13 @@ defmodule WordListItem do
         </h2>
 
         <.button
-          class="size-10 ml-auto items-center"
-          variant="primary"
+          variant="icon"
           phx-click="delete_word"
           phx-value-id={@word.id}
           phx-target={@target}
+          class="ml-auto"
         >
-          <.icon name="hero-trash" class="" />
+          <.icon name="hero-trash" class="size-4" />
         </.button>
       </div>
 
