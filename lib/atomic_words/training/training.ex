@@ -75,8 +75,6 @@ defmodule AtomicWords.Training do
     end
   end
 
-  defp take_random(list, limit), do: Enum.take_random(list, limit)
-
   def complete_training(session_id, user_id) do
     Repo.get(Session, session_id)
     |> Session.changeset(%{completed_at: DateTime.utc_now()}, user_id)

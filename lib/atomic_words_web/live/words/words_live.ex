@@ -148,4 +148,14 @@ defmodule AtomicWordsWeb.WordsLive do
 
     {:noreply, assign(socket, selected_filter: selected_filter, words: words)}
   end
+
+  @impl true
+  def handle_info({:word_deleted, _id}, socket) do
+    %{user: %{id: user_id}} = socket.assigns.current_scope
+    words = Dictionary.user_words(user_id)
+
+    socket = assign(socket, :words, words)
+
+    {:noreply, socket}
+  end
 end
