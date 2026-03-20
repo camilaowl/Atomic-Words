@@ -18,11 +18,20 @@ defmodule AtomicWords.Dictionary do
   end
 
   def search_partial_in_user_words(input, user_id) do
+    like = "%#{input}%"
+
     query =
       from w in Word,
         join: uw in UserWords,
         on: uw.word_id == w.id,
-        where: uw.user_id == ^user_id and ilike(w.text, ^"%#{input}%"),
+        left_join: wt in WordTranslation,
+        on: wt.word_id == w.id,
+        left_join: tw in Word,
+        on: tw.id == wt.translation_id,
+        where:
+          uw.user_id == ^user_id and
+            (ilike(w.text, ^like) or ilike(tw.text, ^like)),
+        distinct: w.id,
         select: w
 
     for word <- Repo.all(query), do: word_with_translations(word)
