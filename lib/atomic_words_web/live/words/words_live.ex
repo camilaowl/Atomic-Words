@@ -98,6 +98,13 @@ defmodule AtomicWordsWeb.WordsLive do
               Add word
             </.button>
           </div>
+          <%= if @show_add_word_modal do %>
+            <.live_component
+              module={AtomicWordsWeb.LiveComponents.Words.AddWordModal}
+              id="add-word-modal"
+              current_scope={@current_scope}
+            />
+          <% end %>
           <div id="words-list" class="w-1/2">
             <.live_component
               module={AtomicWordsWeb.LiveComponents.Words.WordList}
@@ -121,6 +128,7 @@ defmodule AtomicWordsWeb.WordsLive do
       socket
       |> assign(:words, words)
       |> assign(:selected_filter, :all)
+      |> assign(:show_add_word_modal, false)
 
     {:ok, socket}
   end
@@ -151,7 +159,7 @@ defmodule AtomicWordsWeb.WordsLive do
 
   @impl true
   def handle_event("add_word", _params, socket) do
-    send(self(), {:add_word})
+    socket = assign(socket, :show_add_word_modal, true)
     {:noreply, socket}
   end
 

@@ -59,8 +59,18 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
             <SearchItem.search_item
               item={search_result}
               added={MapSet.member?(@added_word_ids, search_result.id)}
-              phx-click="add_item"
-              phx-target={@myself}
+              button_attrs={
+                %{
+                  "phx-click" => "add_item",
+                  "phx-target" => @myself
+                }
+              }
+              container_attrs={
+                %{
+                  "phx-click" => "select_item",
+                  "phx-target" => @myself
+                }
+              }
             />
           <% end %>
         </datalist>
@@ -122,6 +132,11 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
       |> assign(:search_query, "")
       |> assign(:search_results, [])
 
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("select_item", %{"id" => item_id}, socket) do
     {:noreply, socket}
   end
 
