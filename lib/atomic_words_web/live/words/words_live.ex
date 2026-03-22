@@ -12,6 +12,13 @@ defmodule AtomicWordsWeb.WordsLive do
       active_session={@active_session}
     >
       <div class="flex flex-col items-center justify-center gap-y-6">
+        <%= if @show_add_word_modal do %>
+          <.live_component
+            module={AtomicWordsWeb.LiveComponents.Words.AddWordModal}
+            id="add-word-modal"
+            current_scope={@current_scope}
+          />
+        <% end %>
         <%= if Enum.empty?(@words) do %>
           <div class="flex flex-col items-center justify-center gap-2 p-4 mt-12">
             <p class="text-gray-500 text-lg">
@@ -98,13 +105,7 @@ defmodule AtomicWordsWeb.WordsLive do
               Add word
             </.button>
           </div>
-          <%= if @show_add_word_modal do %>
-            <.live_component
-              module={AtomicWordsWeb.LiveComponents.Words.AddWordModal}
-              id="add-word-modal"
-              current_scope={@current_scope}
-            />
-          <% end %>
+
           <div id="words-list" class="w-1/2">
             <.live_component
               module={AtomicWordsWeb.LiveComponents.Words.WordList}
@@ -164,6 +165,12 @@ defmodule AtomicWordsWeb.WordsLive do
   end
 
   @impl true
+  def handle_event("close_add_word_modal", _params, socket) do
+    socket = assign(socket, :show_add_word_modal, false)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("clear_search", _params, socket) do
     user_id = socket.assigns.current_scope.user.id
     words = Dictionary.user_words(user_id)
@@ -188,6 +195,11 @@ defmodule AtomicWordsWeb.WordsLive do
       end
 
     {:noreply, assign(socket, selected_filter: selected_filter, words: words)}
+  end
+
+  @impl true
+  def handle_info(:close_add_word_modal, socket) do
+    {:noreply, assign(socket, :show_add_word_modal, false)}
   end
 
   @impl true

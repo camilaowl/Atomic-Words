@@ -4,6 +4,8 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   import AtomicWordsWeb.CoreComponents
   alias AtomicWords.Dictionary
 
+  attr :max_results, :integer, default: 10
+
   @impl true
   def render(assigns) do
     ~H"""
@@ -35,21 +37,21 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
               placeholder="Type to search words..."
               phx-debounce="300"
             />
-            <button
+            <.button
+              variant="icon"
               type="button"
-              aria-label="Clear search"
               phx-click="clear_search"
               phx-target={@myself}
-              class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              class="p-2 m-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
             >
               <.icon name="hero-x-mark" class="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            </button>
+            </.button>
           </form>
         </div>
       </div>
 
       <%= if Enum.empty?(@search_results) do %>
-        <p class="text-sm text-gray-500">No results</p>
+        <%!-- some empty search results message --%>
       <% else %>
         <datalist
           id="search-results-list"
