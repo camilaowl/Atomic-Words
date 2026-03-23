@@ -67,8 +67,8 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             </div>
             <div class="flex flex-wrap gap-2">
               <%= for translation <- @translations do %>
-                <.translation_variant
-                  translation={translation}
+                <.badge
+                  text={translation}
                   on_remove="remove_translation_variant"
                   target={@myself}
                 />
@@ -104,16 +104,11 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             <div class="flex flex-wrap gap-2">
               <%= for use_case <- @use_cases do %>
                 <div class="flex items-center gap-2">
-                  <span class="bg-gray-100 rounded-lg p-1 flex-1">{use_case}</span>
-                  <.button
-                    type="button"
-                    variant="icon"
-                    phx-click="remove_use_case_variant"
-                    phx-target={@myself}
-                    value={use_case}
-                  >
-                    <.icon name="hero-x-mark" class="size-4" />
-                  </.button>
+                  <.badge
+                    text={use_case}
+                    on_remove="remove_use_case_variant"
+                    target={@myself}
+                  />
                 </div>
               <% end %>
             </div>

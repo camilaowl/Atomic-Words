@@ -1,22 +1,21 @@
 defmodule DictionaryComponents do
   use AtomicWordsWeb, :live_view
 
-  attr :translation, :string, required: true
+  attr :text, :string, required: true
   attr :on_remove, :string, required: true
   attr :target, :any, required: true
 
-  @spec translation_variant(map()) :: Phoenix.LiveView.Rendered.t()
-  def translation_variant(assigns) do
+  @spec badge(map()) :: Phoenix.LiveView.Rendered.t()
+  def badge(assigns) do
     ~H"""
     <div
-      class="group relative w-fit overflow-hidden rounded-lg bg-gray-100 p-2 transition-colors duration-200 hover:bg-red-100 cursor-pointer"
+      class="flex flex-row gap-1 items-center justify-center rounded-lg p-2 transition-colors duration-200 shadow-sm cursor-pointer hover:opacity-80 bg-gray-50"
       phx-click={@on_remove}
-      phx-value-value={@translation}
+      phx-value-value={@text}
       phx-target={@target}
     >
-      <div class="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-red-200">
-      </div>
-      <span class="relative z-10 block truncate text-gray-800">{@translation}</span>
+      <span class="relative z-10 block break-words text-gray-800">{@text}</span>
+      <.icon name="hero-x-mark" class="size-5 shrink-0 text-gray-600" />
     </div>
     """
   end
