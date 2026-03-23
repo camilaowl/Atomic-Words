@@ -1,8 +1,9 @@
 defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
-  alias AtomicWordsWeb.LiveComponents.SearchComponent
   use AtomicWordsWeb, :live_component
 
-  alias AtomicWords.Dictionary
+  alias AtomicWordsWeb.LiveComponents.SearchComponent
+  import DictionaryComponents
+
   attr :current_scope, :any, required: true
 
   @impl true
@@ -15,7 +16,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
       phx-key="escape"
       phx-target={@myself}
     >
-      <div class="absolute inset-0 bg-black/40" phx-click="close_edit_modal" phx-target={@myself}/>
+      <div class="absolute inset-0 bg-black/40" phx-click="close_edit_modal" phx-target={@myself} />
       <div class="relative z-10 w-full max-w-xl rounded-xl bg-white p-6 shadow-xl">
         <div class="flex flex-col items-center justify-between ">
           <.live_component
@@ -64,20 +65,13 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                 <.icon name="hero-check" class="size-4" />
               </.button>
             </div>
-            <div class="grid grid-flow-row-dense gap-2">
+            <div class="flex flex-wrap gap-2">
               <%= for translation <- @translations do %>
-                <div class="flex items-center gap-2">
-                  <span class="bg-gray-100 rounded-lg p-1 flex-1">{translation}</span>
-                  <.button
-                    type="button"
-                    variant="icon"
-                    phx-click="remove_translation_variant"
-                    phx-target={@myself}
-                    value={translation}
-                  >
-                    <.icon name="hero-x-mark" class="size-4" />
-                  </.button>
-                </div>
+                <.translation_variant
+                  translation={translation}
+                  on_remove="remove_translation_variant"
+                  target={@myself}
+                />
               <% end %>
             </div>
             <div class="flex flex-row gap-2 w-full max-w-lg justify-between items-center">
@@ -107,7 +101,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                 <.icon name="hero-check" class="size-4" />
               </.button>
             </div>
-            <div class="grid grid-flow-row-dense gap-2">
+            <div class="flex flex-wrap gap-2">
               <%= for use_case <- @use_cases do %>
                 <div class="flex items-center gap-2">
                   <span class="bg-gray-100 rounded-lg p-1 flex-1">{use_case}</span>
