@@ -38,13 +38,15 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
               type="text"
               placeholder="Word"
             />
-            <div class="flex flex-row gap-2">
+            <div class="flex flex-row w-full max-w-lg gap-2 justify-between items-center">
+              <div class="grow [&_.fieldset]:mb-0">
               <.input
                 field={@form[:translation]}
-                class="border-1 border-gray-200 rounded-lg p-2 justify-stretch"
+                  class="w-full border-1 border-gray-200 rounded-lg p-2"
                 type="text"
                 placeholder="Translation"
               />
+              </div>
               <% translation_value = Map.get(@form.params, "translation", "") %>
               <.button
                 type="button"
@@ -53,7 +55,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                 phx-target={@myself}
                 disabled={translation_value == "" or translation_value in @translations}
                 class={
-                  "ml-auto transition-colors " <>
+                  "transition-colors " <>
                     if(translation_value == "" or translation_value in @translations,
                       do: "bg-gray-200 cursor-not-allowed",
                       else: "bg-green-200 hover:bg-green-300"
