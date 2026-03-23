@@ -150,6 +150,23 @@
 
 @layer components {
 
+  .btn-text,
+  .btn.btn-text {
+    border: 0 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: auto;
+    height: auto;
+    width: auto;
+    color: rgb(55 65 81);
+  }
+
+  .btn-text:hover,
+  .btn.btn-text:hover {
+    background-color: transparent !important;
+  }
+
   .btn-icon,
   .btn.btn-icon {
     display: inline-flex;

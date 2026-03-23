@@ -15,8 +15,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
       phx-key="escape"
       phx-target={@myself}
     >
-      <div class="absolute inset-0 bg-black/40" phx-click="close_edit_modal" phx-target={@myself}>
-      </div>
+      <div class="absolute inset-0 bg-black/40" phx-click="close_edit_modal" phx-target={@myself}/>
       <div class="relative z-10 w-full max-w-xl rounded-xl bg-white p-6 shadow-xl">
         <div class="flex flex-col items-center justify-between ">
           <.live_component
@@ -40,12 +39,12 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             />
             <div class="flex flex-row w-full max-w-lg gap-2 justify-between items-center">
               <div class="grow [&_.fieldset]:mb-0">
-              <.input
-                field={@form[:translation]}
+                <.input
+                  field={@form[:translation]}
                   class="w-full border-1 border-gray-200 rounded-lg p-2"
-                type="text"
-                placeholder="Translation"
-              />
+                  type="text"
+                  placeholder="Translation"
+                />
               </div>
               <% translation_value = Map.get(@form.params, "translation", "") %>
               <.button
@@ -65,7 +64,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                 <.icon name="hero-check" class="size-4" />
               </.button>
             </div>
-            <div class="grid grid-flow-row gap-2">
+            <div class="grid grid-flow-row-dense gap-2">
               <%= for translation <- @translations do %>
                 <div class="flex items-center gap-2">
                   <span class="bg-gray-100 rounded-lg p-1 flex-1">{translation}</span>
@@ -81,12 +80,65 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                 </div>
               <% end %>
             </div>
-            <.input
-              field={@form[:use_case]}
-              class="border-1 border-gray-200 rounded-lg p-2 w-full"
-              type="text"
-              placeholder="Use Case"
-            />
+            <div class="flex flex-row gap-2 w-full max-w-lg justify-between items-center">
+              <div class="grow [&_.fieldset]:mb-0">
+                <.input
+                  field={@form[:use_case]}
+                  class="w-full border-1 border-gray-200 rounded-lg p-2"
+                  type="text"
+                  placeholder="Use Case"
+                />
+              </div>
+              <% use_case_value = Map.get(@form.params, "use_case", "") %>
+              <.button
+                type="button"
+                variant="icon"
+                phx-click="add_use_case_variant"
+                phx-target={@myself}
+                disabled={use_case_value == "" or use_case_value in @use_cases}
+                class={
+                  "transition-colors " <>
+                    if(use_case_value == "" or use_case_value in @use_cases,
+                      do: "bg-gray-200 cursor-not-allowed",
+                      else: "bg-green-200 hover:bg-green-300"
+                    )
+                }
+              >
+                <.icon name="hero-check" class="size-4" />
+              </.button>
+            </div>
+            <div class="grid grid-flow-row-dense gap-2">
+              <%= for use_case <- @use_cases do %>
+                <div class="flex items-center gap-2">
+                  <span class="bg-gray-100 rounded-lg p-1 flex-1">{use_case}</span>
+                  <.button
+                    type="button"
+                    variant="icon"
+                    phx-click="remove_use_case_variant"
+                    phx-target={@myself}
+                    value={use_case}
+                  >
+                    <.icon name="hero-x-mark" class="size-4" />
+                  </.button>
+                </div>
+              <% end %>
+            </div>
+            <div class="flex flex-row gap-4 mt-4 justify-end">
+              <.button
+                type="button"
+                variant="text"
+                phx-click="close_edit_modal"
+                phx-target={@myself}
+              >
+                Cancel
+              </.button>
+              <.button
+                variant="primary"
+                type="submit"
+              >
+                Save
+              </.button>
+            </div>
           </.form>
         </div>
         <!-- form goes here -->
@@ -138,6 +190,29 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
   @impl true
   def handle_event("remove_translation_variant", %{"value" => value}, socket) do
     {:noreply, assign(socket, translations: List.delete(socket.assigns.translations, value))}
+  end
+
+  @impl true
+  def handle_event("add_use_case_variant", _params, socket) do
+    use_case = socket.assigns.form.params["use_case"] || ""
+
+    socket =
+      if use_case == "" do
+        socket
+      else
+        new_params = Map.put(socket.assigns.form.params, "use_case", "")
+
+        socket
+        |> assign(:use_cases, socket.assigns.use_cases ++ [use_case])
+        |> assign(:form, to_form(new_params, as: :word))
+      end
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("remove_use_case_variant", %{"value" => value}, socket) do
+    {:noreply, assign(socket, use_cases: List.delete(socket.assigns.use_cases, value))}
   end
 
   @impl true

@@ -90,11 +90,16 @@ defmodule AtomicWordsWeb.CoreComponents do
   """
   attr :rest, :global, include: ~w(href navigate patch method download name value disabled)
   attr :class, :string
-  attr :variant, :string, values: ~w(primary icon)
+  attr :variant, :string, values: ~w(primary icon text)
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{"primary" => "btn-primary", "icon" => "btn-icon", nil => "btn-primary btn-soft"}
+    variants = %{
+      "primary" => "btn-primary",
+      "icon" => "btn-icon",
+      "text" => "btn-text",
+      nil => "btn-primary btn-soft"
+    }
 
     base_classes = ["btn", Map.fetch!(variants, assigns[:variant])]
 
