@@ -13,25 +13,22 @@ defmodule AtomicWordsWeb.HomeLive do
       active_tab={:home}
       active_session={@active_session}
     >
-      <div class="flex flex-row justify-center w-full">
-        <div class="flex-col justify-center w-1/2">
+      <div class="w-1/2 mx-auto">
+        <.live_component
+          module={AtomicWordsWeb.LiveComponents.SearchComponent}
+          id="search"
+          current_scope={@current_scope}
+        />
+
+        <div id="words-list" class="mt-5">
+          <h1>The last added:</h1>
           <.live_component
-            module={AtomicWordsWeb.LiveComponents.SearchComponent}
-            id="search"
+            module={AtomicWordsWeb.LiveComponents.Words.WordList}
+            id="last-added"
+            words={@last_added}
             current_scope={@current_scope}
           />
-
-          <div id="words-list" class="mt-5" style="margin-top: 20px;">
-            <h1>The last added:</h1>
-            <.live_component
-              module={AtomicWordsWeb.LiveComponents.Words.WordList}
-              id="last-added"
-              words={@last_added}
-              current_scope={@current_scope}
-            />
-          </div>
         </div>
-        <div id="spacer" class="w-1/4" />
       </div>
     </Layouts.app>
     """

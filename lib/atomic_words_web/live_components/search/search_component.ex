@@ -5,6 +5,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
   alias AtomicWords.Dictionary
 
   attr :max_results, :integer, default: 10
+  attr :notify_on_select, :any, default: nil
 
   @impl true
   def render(assigns) do
@@ -34,6 +35,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
               type="search"
               id="search"
               name="search"
+              value={@search_query}
               placeholder="Type to search words..."
               phx-debounce="300"
             />
@@ -55,7 +57,14 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
       <% else %>
         <datalist
           id="search-results-list"
-          class="card flex flex-col rounded-lg shadow-lg w-full bg-blue"
+          class={[
+            "absolute top-full left-0 z-10 mt-1",
+            "w-full max-h-64 overflow-y-auto",
+            "flex flex-col gap-1 py-2 pr-1",
+            "rounded-lg shadow-lg border",
+            "bg-white border-gray-200",
+            "dark:bg-gray-800 dark:border-gray-700"
+          ]}
         >
           <%= for search_result <- @search_results do %>
             <SearchItem.search_item
@@ -105,12 +114,18 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   @impl true
   def handle_event("change", %{"search" => ""}, socket) do
-    socket = assign(socket, :search_results, [])
+    socket =
+      socket
+      |> assign(:search_query, "")
+      |> assign(:search_results, [])
+
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("change", %{"search" => search_query}, socket) do
+    socket = assign(socket, :search_query, search_query)
+
     if String.length(search_query) > 2 do
       search_results =
         Dictionary.search_partial(
@@ -139,6 +154,18 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   @impl true
   def handle_event("select_item", %{"id" => item_id}, socket) do
+    socket =
+      if notify = socket.assigns[:notify_on_select] do
+        {module, id} = notify
+        send_update(module, id: id, selected_item: item_id)
+
+        socket
+        |> assign(:search_query, "")
+        |> assign(:search_results, [])
+      else
+        socket
+      end
+
     {:noreply, socket}
   end
 

@@ -23,6 +23,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             module={SearchComponent}
             id="search_component"
             current_scope={@current_scope}
+            notify_on_select={{__MODULE__, @id}}
           />
           <.form
             for={@form}
@@ -124,6 +125,9 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
               <.button
                 variant="primary"
                 type="submit"
+                phx-click="save_word"
+                phx-target={@myself}
+                disabled={@form[:word].value == "" or length(@translations) == 0}
               >
                 Save
               </.button>
@@ -154,8 +158,41 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
   end
 
   @impl true
+  def update(%{selected_item: _} = assigns, socket) do
+    item_id = assigns.selected_item
+
+    socket =
+      case Integer.parse(item_id) do
+        {id, _} ->
+          word = AtomicWords.Dictionary.word_by_id(id)
+          translations = Enum.map(word.translations, & &1.text)
+
+          new_params = %{"word" => word.word, "translation" => "", "use_case" => ""}
+
+          socket
+          |> assign(:form, to_form(new_params, as: :word))
+          |> assign(:translations, translations)
+
+        :error ->
+          socket
+      end
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def update(assigns, socket) do
+    {:ok, assign(socket, assigns)}
+  end
+
+  @impl true
   def handle_event("validate", %{"word" => params}, socket) do
     {:noreply, assign(socket, form: to_form(params, as: :word))}
+  end
+
+  @impl true
+  def handle_event("save_word", _params, socket) do
+    {:noreply, socket}
   end
 
   @impl true
