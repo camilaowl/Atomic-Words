@@ -9,12 +9,18 @@ defmodule AtomicWords.Dictionary do
   alias AtomicWords.Dictionary.WordViewModel
 
   def search_partial(input, original_lang, target_lang) do
-    query = search_partial_query(input)
+    query = search_partial_query(input, original_lang)
 
     case Repo.all(query) do
       [] -> fetch_and_add_word(input, original_lang, target_lang)
       results -> results
     end
+  end
+
+  defp search_partial_query(input, lang) do
+    from w in Word,
+      where: ilike(w.text, ^"%#{input}%") and w.lang == ^lang,
+      select: w
   end
 
   def search_partial_in_user_words(input, user_id) do
@@ -47,7 +53,7 @@ defmodule AtomicWords.Dictionary do
         |> case do
           {:ok, translated_text} ->
             add_translated_word(input, translated_text, original_lang, target_lang)
-            Repo.all(search_partial_query(input))
+            Repo.all(search_partial_query(input, original_lang))
 
           _ ->
             []
@@ -57,12 +63,6 @@ defmodule AtomicWords.Dictionary do
         []
     end
     |> IO.inspect(label: "fetch_and_add_word result")
-  end
-
-  defp search_partial_query(input) do
-    from w in Word,
-      where: ilike(w.text, ^"%#{input}%"),
-      select: w
   end
 
   @spec add_word(any(), any()) :: any()
@@ -156,14 +156,21 @@ defmodule AtomicWords.Dictionary do
   end
 
   def word_with_translations(word) do
-    translation_query =
+    forward_query =
       from wt in WordTranslation,
         join: w in Word,
         on: wt.translation_id == w.id,
         where: wt.word_id == ^word.id,
         select: w
 
-    translations = Repo.all(translation_query)
+    backward_query =
+      from wt in WordTranslation,
+        join: w in Word,
+        on: wt.word_id == w.id,
+        where: wt.translation_id == ^word.id,
+        select: w
+
+    translations = Repo.all(forward_query) ++ Repo.all(backward_query)
 
     %WordViewModel{
       :id => word.id,
