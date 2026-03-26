@@ -117,6 +117,19 @@ defmodule AtomicWords.Dictionary do
     |> Enum.map(& &1.word_id)
   end
 
+  def save_word(word, original_lang, translations, translation_lang, user_id) do
+    {:ok, original} = add_word(word, original_lang)
+
+    for translation <- translations do
+      {:ok, translated} = add_word(translation, translation_lang)
+      bind_words(original.id, translated.id)
+    end
+
+    add_user_word(user_id, original.id)
+
+    {:ok, original}
+  end
+
   def add_user_word(user_id, word_id) do
     Repo.insert(%UserWords{user_id: user_id, word_id: word_id},
       on_conflict: :nothing,

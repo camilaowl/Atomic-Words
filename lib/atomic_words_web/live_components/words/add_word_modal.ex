@@ -1,4 +1,5 @@
 defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
+  alias AtomicWords.Dictionary
   use AtomicWordsWeb, :live_component
 
   alias AtomicWordsWeb.LiveComponents.SearchComponent
@@ -23,7 +24,10 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             module={SearchComponent}
             id="search_component"
             current_scope={@current_scope}
+            origin_lang={@origin_lang}
+            target_lang={@target_lang}
             notify_on_select={{__MODULE__, @id}}
+            notify_on_lang_change={{__MODULE__, @id}}
           />
           <.form
             for={@form}
@@ -45,7 +49,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                   field={@form[:translation]}
                   class="w-full border-1 border-gray-200 rounded-lg p-2"
                   type="text"
-                  placeholder="Translation"
+                  placeholder="Add Translation"
                 />
               </div>
               <% translation_value = Map.get(@form.params, "translation", "") %>
@@ -81,7 +85,7 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
                   field={@form[:use_case]}
                   class="w-full border-1 border-gray-200 rounded-lg p-2"
                   type="text"
-                  placeholder="Use Case"
+                  placeholder="Add Use Case"
                 />
               </div>
               <% use_case_value = Map.get(@form.params, "use_case", "") %>
@@ -134,7 +138,6 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
             </div>
           </.form>
         </div>
-        <!-- form goes here -->
       </div>
     </div>
     """
@@ -153,8 +156,15 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
       |> assign(:form, form)
       |> assign(:translations, [])
       |> assign(:use_cases, [])
+      |> assign(:origin_lang, "en")
+      |> assign(:target_lang, "uk")
 
     {:ok, socket}
+  end
+
+  @impl true
+  def update(%{origin_lang: origin_lang, target_lang: target_lang}, socket) do
+    {:ok, assign(socket, origin_lang: origin_lang, target_lang: target_lang)}
   end
 
   @impl true
@@ -192,6 +202,22 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
 
   @impl true
   def handle_event("save_word", _params, socket) do
+    Dictionary.save_word(
+      socket.assigns.form[:word].value,
+      socket.assigns.origin_lang,
+      socket.assigns.translations,
+      socket.assigns.target_lang,
+      socket.assigns.current_scope.user.id
+    )
+
+    socket =
+      socket
+      |> assign(:form, to_form(%{"word" => "", "translation" => "", "use_case" => ""}, as: :word))
+      |> assign(:translations, [])
+      |> assign(:use_cases, [])
+
+    send(self(), :close_add_word_modal)
+    send(self(), :update_word_list)
     {:noreply, socket}
   end
 

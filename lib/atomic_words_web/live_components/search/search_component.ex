@@ -6,6 +6,7 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   attr :max_results, :integer, default: 10
   attr :notify_on_select, :any, default: nil
+  attr :notify_on_lang_change, :any, default: nil
 
   @impl true
   def render(assigns) do
@@ -195,13 +196,18 @@ defmodule AtomicWordsWeb.LiveComponents.SearchComponent do
 
   @impl true
   def handle_event("switch_languages", _params, socket) do
-    origin_lang = socket.assigns.origin_lang
-    target_lang = socket.assigns.target_lang
+    origin_lang = socket.assigns.target_lang
+    target_lang = socket.assigns.origin_lang
 
     socket =
       socket
-      |> assign(:origin_lang, target_lang)
-      |> assign(:target_lang, origin_lang)
+      |> assign(:origin_lang, origin_lang)
+      |> assign(:target_lang, target_lang)
+
+    if notify = socket.assigns[:notify_on_lang_change] do
+      {module, id} = notify
+      send_update(module, id: id, origin_lang: origin_lang, target_lang: target_lang)
+    end
 
     {:noreply, socket}
   end
