@@ -129,8 +129,6 @@ defmodule AtomicWordsWeb.LiveComponents.Words.AddWordModal do
               <.button
                 variant="primary"
                 type="submit"
-                phx-click="save_word"
-                phx-target={@myself}
                 disabled={@form[:word].value == "" or length(@translations) == 0}
               >
                 Save
