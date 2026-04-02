@@ -145,6 +145,18 @@ defmodule AtomicWordsWeb.UserLive.Settings do
       </div>
       <div id="theme" class="">
         <p class="text-2xl font-bold mb-4">Theme</p>
+        <label class="flex items-center gap-3 cursor-pointer w-fit">
+          <input
+            id="dark-mode-toggle"
+            type="checkbox"
+            class="sr-only peer"
+            phx-hook="ThemeToggle"
+            phx-update="ignore"
+          />
+          <div class="relative w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:after:translate-x-5">
+          </div>
+          <span class="text-gray-700 dark:text-white font-medium">Dark Mode</span>
+        </label>
       </div>
     </div>
     """
