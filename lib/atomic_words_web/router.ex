@@ -57,8 +57,12 @@ defmodule AtomicWordsWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{AtomicWordsWeb.UserAuth, :require_authenticated}] do
-      live "/users/settings", UserLive.Settings, :edit
-      live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
+      live "/users/settings", UserLive.Settings, :general
+      live "/users/settings/languages", UserLive.Settings, :languages
+      live "/users/settings/training", UserLive.Settings, :training
+      live "/users/settings/dictionary", UserLive.Settings, :dictionary
+      live "/users/settings/account", UserLive.Settings, :account
+      # live "/users/settings/confirm-email/:token", UserLive.Settings, :confirm_email
       live "/", HomeLive
       live "/training", TrainingLive
       live "/training_mode", TrainingModeLive

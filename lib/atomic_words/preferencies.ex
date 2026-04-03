@@ -127,4 +127,35 @@ defmodule AtomicWords.Preferencies do
 
     Repo.one(query)
   end
+
+  def interface_lang(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.interface_lang
+
+    Repo.one(query) || "en"
+  end
+
+  def update_interface_lang(user_id, lang) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.interface_lang_changeset(%{interface_lang: lang}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.interface_lang_changeset(%{interface_lang: lang}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.update()
+    end
+  end
 end

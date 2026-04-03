@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Language: uk\n"
+
+msgid "Settings"
+msgstr "Налаштування"
+
+msgid "General"
+msgstr "Загальні"
+
+msgid "Manage Account"
+msgstr "Управління Акаунтом"
+
+msgid "Theme"
+msgstr "Тема"
+
+msgid "Dark Mode"
+msgstr "Темний Режим"
+
+msgid "Interface Language"
+msgstr "Мова інтерфейсу"
+
+msgid "Languages"
+msgstr "Мови"
+
+msgid "Training"
+msgstr "Вправи"
+
+msgid "Dictionary"
+msgstr "Словник"
+
+msgid "Account"
+msgstr "Акаунт"
+
+msgid "Native Language"
+msgstr "Рідна Мова"
+
+msgid "Target language"
+msgstr "Вивчаєма Мова"

@@ -1,0 +1,30 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+
+msgid "Atomic Words"
+msgstr "Atomic Words"
+
+msgid "Home"
+msgstr "Home"
+
+msgid "Training"
+msgstr "Training"
+
+msgid "My Dictionary"
+msgstr "My Dictionary"
+
+msgid "Statistics"
+msgstr "Statistics"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Profile"
+msgstr "Profile"
+
+msgid "Type to search words"
+msgstr "Type to search words..."
+
+msgid "The last added"
+msgstr "The last added:"

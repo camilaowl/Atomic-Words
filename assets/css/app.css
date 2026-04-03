@@ -1,7 +1,7 @@
 /* See the Tailwind configuration guide for advanced usage
    https://tailwindcss.com/docs/configuration */
 
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 @source "../css";
 @source "../js";
 @source "../../lib/atomic_words_web";
@@ -149,6 +149,42 @@
 }
 
 @layer components {
+
+  .btn-text,
+  .btn.btn-text {
+    border: 0 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: auto;
+    height: auto;
+    width: auto;
+    color: rgb(55 65 81);
+  }
+
+  .btn-text:hover,
+  .btn.btn-text:hover {
+    background-color: transparent !important;
+  }
+
+  .btn-icon,
+  .btn.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4.25rem;
+    height: 4.25rem;
+    box-sizing: border-box;
+    padding: 0;
+    padding-inline: 0 !important;
+    border-radius: 9999px !important;
+    aspect-ratio: 1 / 1;
+    line-height: 1;
+    gap: 0;
+    --btn-p: 0;
+    --size: 4.25rem;
+  }
+
   .flashcard-stack {
     position: relative;
   }

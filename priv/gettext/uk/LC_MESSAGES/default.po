@@ -1,0 +1,30 @@
+msgid ""
+msgstr ""
+"Language: uk\n"
+
+msgid "Atomic Words"
+msgstr "Atomic Words"
+
+msgid "Home"
+msgstr "Головна"
+
+msgid "Training"
+msgstr "Вправи"
+
+msgid "My Dictionary"
+msgstr "Мій Словник"
+
+msgid "Statistics"
+msgstr "Статистика"
+
+msgid "Settings"
+msgstr "Налаштування"
+
+msgid "Profile"
+msgstr "Профіль"
+
+msgid "Type to search words"
+msgstr "Шукати слова"
+
+msgid "The last added"
+msgstr "Останні додані"
