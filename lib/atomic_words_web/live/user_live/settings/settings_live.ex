@@ -41,7 +41,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
                 auto_add_random_words={@auto_add_random_words}
               />
             <% :dictionary -> %>
-              <.dictionary_settings />
+              <.dictionary_settings transcription_variant={@transcription_variant} />
             <% :languages -> %>
               <.language_settings
                 original_lang={@original_lang}
@@ -340,8 +340,42 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
   def dictionary_settings(assigns) do
     ~H"""
-    <div>
-      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Dictionary")}</h2>
+    <div class="max-w-2xl space-y-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {dgettext("settings", "Dictionary")}
+      </h2>
+
+      <%!-- Transcription Variant --%>
+      <div id="transcription-variant" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Transcription Variant")}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          {dgettext("settings", "Choose which phonetic transcription style to display.")}
+        </p>
+        <form phx-change="save_transcription_variant" id="transcription-variant-form">
+          <div class="relative w-fit">
+            <select
+              name="transcription_variant"
+              id="transcription-variant-select"
+              class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="us" selected={@transcription_variant == "us"}>
+                {dgettext("settings", "US English")}
+              </option>
+              <option value="uk" selected={@transcription_variant == "uk"}>
+                {dgettext("settings", "UK English")}
+              </option>
+              <option value="both" selected={@transcription_variant == "both"}>
+                {dgettext("settings", "Both")}
+              </option>
+            </select>
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            </span>
+          </div>
+        </form>
+      </div>
     </div>
     """
   end
@@ -468,6 +502,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
       |> assign(:default_session_size, 15)
       |> assign(:card_orientation_word_first, true)
       |> assign(:auto_add_random_words, false)
+      |> assign(:transcription_variant, "us")
 
     {:ok, socket}
   end
@@ -663,6 +698,18 @@ defmodule AtomicWordsWeb.UserLive.Settings do
     end
   end
 
+  def handle_event("save_transcription_variant", %{"transcription_variant" => variant}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    case Preferencies.update_transcription_variant(user_id, variant) do
+      {:ok, _} ->
+        {:noreply, assign(socket, :transcription_variant, variant)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Could not save transcription variant.")}
+    end
+  end
+
   @impl true
   def handle_params(_params, _uri, socket) do
     live_action = socket.assigns.live_action
@@ -698,7 +745,10 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           |> assign(:auto_add_random_words, Preferencies.auto_add_random_words(user_id))
 
         :dictionary ->
+          user_id = socket.assigns.current_scope.user.id
+
           socket
+          |> assign(:transcription_variant, Preferencies.transcription_variant(user_id))
 
         _ ->
           socket

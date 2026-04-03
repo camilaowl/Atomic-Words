@@ -67,3 +67,18 @@ msgstr "Enabled"
 
 msgid "Disabled"
 msgstr "Disabled"
+
+msgid "Transcription Variant"
+msgstr "Transcription Variant"
+
+msgid "Choose which phonetic transcription style to display."
+msgstr "Choose which phonetic transcription style to display."
+
+msgid "US English"
+msgstr "US English"
+
+msgid "UK English"
+msgstr "UK English"
+
+msgid "Both"
+msgstr "Both"

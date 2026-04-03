@@ -293,4 +293,37 @@ defmodule AtomicWords.Preferencies do
         |> Repo.update()
     end
   end
+
+  def transcription_variant(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.transcription_variant
+
+    Repo.one(query) || "us"
+  end
+
+  def update_transcription_variant(user_id, variant) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.transcription_variant_changeset(
+          %{transcription_variant: variant},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.transcription_variant_changeset(
+          %{transcription_variant: variant},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.update()
+    end
+  end
 end

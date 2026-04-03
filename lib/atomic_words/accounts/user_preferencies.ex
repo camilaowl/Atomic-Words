@@ -11,6 +11,7 @@ defmodule AtomicWords.Accounts.UserPreferencies do
     field :default_session_size, :integer, default: 15
     field :card_orientation_word_first, :boolean, default: true
     field :auto_add_random_words, :boolean, default: false
+    field :transcription_variant, :string, default: "us"
     field :user_id, :id
 
     timestamps(type: :utc_datetime)
@@ -88,6 +89,15 @@ defmodule AtomicWords.Accounts.UserPreferencies do
     user_preferencies
     |> cast(attrs, [:auto_add_random_words])
     |> validate_required([:auto_add_random_words])
+    |> put_change(:user_id, user_scope.user.id)
+    |> unique_constraint(:user_id)
+  end
+
+  def transcription_variant_changeset(user_preferencies, attrs, user_scope) do
+    user_preferencies
+    |> cast(attrs, [:transcription_variant])
+    |> validate_required([:transcription_variant])
+    |> validate_inclusion(:transcription_variant, ["uk", "us", "both"])
     |> put_change(:user_id, user_scope.user.id)
     |> unique_constraint(:user_id)
   end
