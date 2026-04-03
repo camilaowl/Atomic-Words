@@ -119,9 +119,12 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
   def general_settings(assigns) do
     ~H"""
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-6">
+      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "General")}</h2>
       <div id="account" class="flex flex-col gap-2">
-        <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "General")}</h2>
+        <p class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Profile")}
+        </p>
         <div id="account" class="flex flex-row gap-4 items-center">
           <%= if @avatar_url do %>
             <img src={@avatar_url} class="w-16 h-16 rounded-full object-cover" />
@@ -133,20 +136,22 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
           <div class="flex flex-col">
             <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {@nickname || dgettext("settings", "User")}
+              {@nickname}
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-400">{@email}</p>
           </div>
         </div>
         <.link
           patch={~p"/users/settings/account"}
-          class="mt-4 inline-block text-blue-600 hover:none"
+          class="mt-2 inline-block text-blue-600 hover:none"
         >
           {dgettext("settings", "Manage Account")}
         </.link>
       </div>
-      <div id="theme" class="">
-        <p class="text-2xl font-bold mb-4">{dgettext("settings", "Theme")}</p>
+      <div id="theme" class="flex flex-col gap-2">
+        <p class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Theme")}
+        </p>
         <label class="flex items-center gap-3 cursor-pointer w-fit">
           <input
             id="dark-mode-toggle"
@@ -162,8 +167,10 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           </span>
         </label>
       </div>
-      <div id="interface_language" class="">
-        <p class="text-2xl font-bold mb-4">{dgettext("settings", "Interface Language")}</p>
+      <div id="interface_language" class="flex flex-col gap-2">
+        <p class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Interface Language")}
+        </p>
         <form
           phx-change="save_interface_language"
           id="interface-lang-form"
@@ -237,19 +244,14 @@ defmodule AtomicWordsWeb.UserLive.Settings do
     <div class="max-w-2xl space-y-8">
       <div>
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Language Preferences</h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Configure your native language and the languages you want to learn.
-        </p>
       </div>
 
       <%!-- Native Language --%>
-      <div id="native-language" class="">
+      <div id="native-language" class="flex flex-col gap-2">
         <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Native Language</h3>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          The language you already speak fluently.
-        </p>
+
         <form phx-submit="save_original_lang" id="original-lang-form" class="flex gap-3 items-end">
-          <div class="relative flex-1">
+          <div class="relative ">
             <select
               name="original_lang"
               class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -259,21 +261,24 @@ defmodule AtomicWordsWeb.UserLive.Settings do
                 <option value={code} selected={@original_lang == code}>{name}</option>
               <% end %>
             </select>
-            <span class="pointer-events-none absolute flex items-center text-gray-400 dark:text-gray-500">
-              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon
+                name="hero-chevron-down"
+                class="w-4 h-4"
+              />
             </span>
           </div>
         </form>
       </div>
 
       <%!-- Languages I'm Learning --%>
-      <div id="target_language" class="">
+      <div id="target_language" class="flex flex-col gap-2">
         <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
           Target Language
         </h3>
 
         <form phx-submit="add_target_lang" id="add-target-lang-form" class="flex gap-3 items-end mb-5">
-          <div class="relative flex-1">
+          <div class="relative">
             <select
               name="new_target_lang"
               class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
@@ -283,8 +288,11 @@ defmodule AtomicWordsWeb.UserLive.Settings do
                 <option value={code}>{name}</option>
               <% end %>
             </select>
-            <span class="pointer-events-none absolute flex items-center text-gray-400 dark:text-gray-500">
-              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon
+                name="hero-chevron-down"
+                class="w-4 h-4"
+              />
             </span>
           </div>
         </form>
