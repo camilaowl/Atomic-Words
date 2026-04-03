@@ -26,6 +26,8 @@ defmodule AtomicWordsWeb.UserLive.Settings do
                 avatar_url={@avatar_url}
                 nickname={@nickname}
                 email={@current_email}
+                interface_languages={@interface_languages}
+                selected_interface_lang={@selected_interface_lang}
               />
             <% :account -> %>
               <.account_settings />
@@ -61,7 +63,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         ]}
         patch={~p"/users/settings"}
       >
-        General
+        {dgettext("settings", "General")}
       </.link>
       <.link
         class={[
@@ -73,7 +75,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         ]}
         patch={~p"/users/settings/languages"}
       >
-        Languages
+        {dgettext("settings", "Languages")}
       </.link>
       <.link
         class={[
@@ -85,7 +87,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         ]}
         patch={~p"/users/settings/training"}
       >
-        Training
+        {dgettext("settings", "Training")}
       </.link>
       <.link
         class={[
@@ -97,7 +99,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         ]}
         patch={~p"/users/settings/dictionary"}
       >
-        Dictionary
+        {dgettext("settings", "Dictionary")}
       </.link>
       <.link
         class={[
@@ -109,7 +111,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         ]}
         patch={~p"/users/settings/account"}
       >
-        Account
+        {dgettext("settings", "Account")}
       </.link>
     </nav>
     """
@@ -119,7 +121,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
     ~H"""
     <div class="flex flex-col gap-4">
       <div id="account" class="flex flex-col gap-2">
-        <h2 class="text-2xl font-bold mb-4">General</h2>
+        <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "General")}</h2>
         <div id="account" class="flex flex-row gap-4 items-center">
           <%= if @avatar_url do %>
             <img src={@avatar_url} class="w-16 h-16 rounded-full object-cover" />
@@ -131,7 +133,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
           <div class="flex flex-col">
             <p class="text-lg font-semibold text-gray-900 dark:text-white">
-              {@nickname || "User"}
+              {@nickname || dgettext("settings", "User")}
             </p>
             <p class="text-sm text-gray-500 dark:text-gray-400">{@email}</p>
           </div>
@@ -140,11 +142,11 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           patch={~p"/users/settings/account"}
           class="mt-4 inline-block text-blue-600 hover:none"
         >
-          Manage Account
+          {dgettext("settings", "Manage Account")}
         </.link>
       </div>
       <div id="theme" class="">
-        <p class="text-2xl font-bold mb-4">Theme</p>
+        <p class="text-2xl font-bold mb-4">{dgettext("settings", "Theme")}</p>
         <label class="flex items-center gap-3 cursor-pointer w-fit">
           <input
             id="dark-mode-toggle"
@@ -155,8 +157,33 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           />
           <div class="relative w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-blue-600 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:after:translate-x-5">
           </div>
-          <span class="text-gray-700 dark:text-white font-medium">Dark Mode</span>
+          <span class="text-gray-700 dark:text-white font-medium">
+            {dgettext("settings", "Dark Mode")}
+          </span>
         </label>
+      </div>
+      <div id="interface_language" class="">
+        <p class="text-2xl font-bold mb-4">{dgettext("settings", "Interface Language")}</p>
+        <form
+          phx-change="save_interface_language"
+          id="interface-lang-form"
+          class="flex gap-3 items-end"
+        >
+          <div class="relative">
+            <select
+              name="interface_lang"
+              id="interface-lang-select"
+              class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <%= for {name, code} <- @interface_languages do %>
+                <option value={code} selected={@selected_interface_lang == code}>{name}</option>
+              <% end %>
+            </select>
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            </span>
+          </div>
+        </form>
       </div>
     </div>
     """
@@ -165,8 +192,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
   def account_settings(assigns) do
     ~H"""
     <div>
-      <h2 class="text-2xl font-bold mb-4">Account Settings</h2>
-      <p>Here you can adjust your account settings.</p>
+      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Account")}</h2>
     </div>
     """
   end
@@ -174,8 +200,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
   def training_settings(assigns) do
     ~H"""
     <div>
-      <h2 class="text-2xl font-bold mb-4">Training Settings</h2>
-      <p>Here you can adjust your training settings.</p>
+      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Training")}</h2>
     </div>
     """
   end
@@ -183,8 +208,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
   def dictionary_settings(assigns) do
     ~H"""
     <div>
-      <h2 class="text-2xl font-bold mb-4">Dictionary Settings</h2>
-      <p>Here you can adjust your dictionary settings.</p>
+      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Dictionary")}</h2>
     </div>
     """
   end
@@ -287,6 +311,9 @@ defmodule AtomicWordsWeb.UserLive.Settings do
     user = socket.assigns.current_scope.user
     email_changeset = Accounts.change_user_email(user, %{}, validate_unique: false)
     password_changeset = Accounts.change_user_password(user, %{}, hash_password: false)
+    interface_lang = Preferencies.interface_lang(user.id)
+
+    Gettext.put_locale(AtomicWordsWeb.Gettext, interface_lang)
 
     socket =
       socket
@@ -299,6 +326,8 @@ defmodule AtomicWordsWeb.UserLive.Settings do
       |> assign(:original_lang, nil)
       |> assign(:target_langs, [])
       |> assign(:selected_target_lang, nil)
+      |> assign(:interface_languages, [{"English", "en"}, {"Українська", "uk"}])
+      |> assign(:selected_interface_lang, interface_lang)
 
     {:ok, socket}
   end
@@ -438,6 +467,22 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         {:noreply, socket}
     end
   end
+
+  def handle_event("save_interface_language", %{"interface_lang" => lang}, socket)
+      when lang in ["en", "uk"] do
+    user_id = socket.assigns.current_scope.user.id
+
+    case Preferencies.update_interface_lang(user_id, lang) do
+      {:ok, _} ->
+        {:noreply, push_navigate(socket, to: ~p"/users/settings")}
+
+      {:error, _} ->
+        {:noreply,
+         put_flash(socket, :error, dgettext("default", "Could not save interface language."))}
+    end
+  end
+
+  def handle_event("save_interface_language", _params, socket), do: {:noreply, socket}
 
   @impl true
   def handle_params(_params, _uri, socket) do
