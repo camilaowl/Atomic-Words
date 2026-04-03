@@ -19,15 +19,37 @@ defmodule WordListItem do
           {@word.us_transcription}
         </h2>
 
-        <.button
-          class="size-10 ml-auto items-center"
-          variant="primary"
-          phx-click="delete_word"
-          phx-value-id={@word.id}
-          phx-target={@target}
-        >
-          <.icon name="hero-trash" class="" />
-        </.button>
+        <div class="flex flex row gap-x-1 ml-auto">
+          <.button
+            variant="icon"
+            phx-click="edit_word"
+            phx-value-id={@word.id}
+            phx-target={@target}
+            class="ml-auto"
+            disabled
+          >
+            <.icon name="hero-speaker-wave" class="size-4" />
+          </.button>
+          <.button
+            variant="icon"
+            phx-click="edit_word"
+            phx-value-id={@word.id}
+            phx-target={@target}
+            class="ml-auto"
+            disabled
+          >
+            <.icon name="hero-pencil-square" class="size-4" />
+          </.button>
+          <.button
+            variant="icon"
+            phx-click="delete_word"
+            phx-value-id={@word.id}
+            phx-target={@target}
+            class="ml-auto"
+          >
+            <.icon name="hero-trash" class="size-4" />
+          </.button>
+        </div>
       </div>
 
       <div class="flex flex-row items-center">

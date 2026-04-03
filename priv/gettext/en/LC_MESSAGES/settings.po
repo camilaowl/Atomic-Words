@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "General"
+msgstr "General"
+
+msgid "Manage Account"
+msgstr "Manage Account"
+
+msgid "Theme"
+msgstr "Theme"
+
+msgid "Dark Mode"
+msgstr "Dark Mode"
+
+msgid "Interface Language"
+msgstr "Interface Language"
+
+msgid "Languages"
+msgstr "Languages"
+
+msgid "Training"
+msgstr "Training"
+
+msgid "Dictionary"
+msgstr "Dictionary"
+
+msgid "Account"
+msgstr "Account"
+
+msgid "Native Language"
+msgstr "Native Language"
+
+msgid "Target language"
+msgstr "Target language"

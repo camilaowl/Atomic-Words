@@ -168,11 +168,36 @@ const FlashcardSwipe = {
   },
 }
 
+const ThemeToggle = {
+  mounted() {
+    const updateChecked = () => {
+      const theme = document.documentElement.getAttribute("data-theme")
+      this.el.checked = theme === "dark"
+    }
+    updateChecked()
+
+    this._observer = new MutationObserver(updateChecked)
+    this._observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"]
+    })
+
+    this.el.addEventListener("change", () => {
+      const theme = this.el.checked ? "dark" : "light"
+      localStorage.setItem("theme", theme)
+      document.documentElement.setAttribute("data-theme", theme)
+    })
+  },
+  destroyed() {
+    this._observer?.disconnect()
+  }
+}
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
-  hooks: { ...colocatedHooks, FlashcardSwipe },
+  hooks: { ...colocatedHooks, FlashcardSwipe, ThemeToggle },
 })
 
 // Show progress bar on live navigation and form submits

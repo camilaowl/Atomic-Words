@@ -110,7 +110,6 @@ defmodule AtomicWordsWeb.Layouts do
         />
         <div class="flex flex-row items-justify-center">
           <.profile_info current_user={@current_user} />
-          <.theme_toggle class="" />
         </div>
       </nav>
     </div>

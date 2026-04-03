@@ -6,6 +6,7 @@ defmodule AtomicWords.Accounts.UserPreferencies do
     field :original_lang, :string
     field :target_lang, {:array, :string}
     field :selected_target_lang, :string
+    field :interface_lang, :string, default: "en"
     field :user_id, :id
 
     timestamps(type: :utc_datetime)
@@ -40,6 +41,15 @@ defmodule AtomicWords.Accounts.UserPreferencies do
     user_preferencies
     |> cast(attrs, [:selected_target_lang])
     |> validate_required([:selected_target_lang])
+    |> put_change(:user_id, user_scope.user.id)
+    |> unique_constraint(:user_id)
+  end
+
+  def interface_lang_changeset(user_preferencies, attrs, user_scope) do
+    user_preferencies
+    |> cast(attrs, [:interface_lang])
+    |> validate_required([:interface_lang])
+    |> validate_inclusion(:interface_lang, ["en", "uk"])
     |> put_change(:user_id, user_scope.user.id)
     |> unique_constraint(:user_id)
   end
