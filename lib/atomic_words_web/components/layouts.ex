@@ -120,19 +120,43 @@ defmodule AtomicWordsWeb.Layouts do
 
   def profile_info(assigns) do
     ~H"""
-    <div class="flex items-center space-x-4 pr-4 my-4">
-      <div class="avatar">
-        <div class="w-12 rounded-full">
-          <img
-            src="/images/avatar.svg"
-            alt="User Avatar"
-            class="size-12"
-          />
+    <div class="relative flex items-center pr-4 my-4 group">
+      <div class="flex items-center gap-3 px-3 py-2 cursor-default">
+        <div class="w-9 h-9 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
+          <img src="/images/avatar.svg" alt="User Avatar" class="w-9 h-9" />
         </div>
+        <div class="text-left hidden sm:block">
+          <p class="text-sm font-semibold text-gray-900 leading-tight">
+            {@current_user.nickname} {@current_user.id}
+          </p>
+          <p class="text-xs text-gray-500 leading-tight">{@current_user.email}</p>
+        </div>
+        <.icon
+          name="hero-chevron-down"
+          class="w-4 h-4 text-gray-400 shrink-0 group-hover:rotate-180 transition-transform duration-200"
+        />
       </div>
-      <div>
-        <p class="text-md font-medium text-gray-900">{@current_user.nickname} {@current_user.id}</p>
-        <p class="text-sm font-medium text-gray-500">{@current_user.email}</p>
+
+      <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 absolute top-full left-1/2 -translate-x-1/2 mt-0 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50">
+        <.link
+          navigate={~p"/users/settings"}
+          class="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <.icon name="hero-cog-6-tooth" class="w-4 h-4" /> Settings
+        </.link>
+        <.link
+          navigate={~p"/users/settings/account"}
+          class="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        >
+          <.icon name="hero-user" class="w-4 h-4" /> Account
+        </.link>
+        <div class="my-1 border-t border-gray-100" />
+        <.link
+          href={~p"/users/log-out"}
+          class="flex items-center gap-2.5 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+        >
+          <.icon name="hero-arrow-left-start-on-rectangle" class="w-4 h-4" /> Log out
+        </.link>
       </div>
     </div>
     """
