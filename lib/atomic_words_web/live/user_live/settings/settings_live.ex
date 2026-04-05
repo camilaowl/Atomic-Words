@@ -1,8 +1,6 @@
 defmodule AtomicWordsWeb.UserLive.Settings do
   use AtomicWordsWeb, :live_view
 
-  on_mount {AtomicWordsWeb.UserAuth, :require_sudo_mode}
-
   alias AtomicWords.Accounts
   alias AtomicWords.Preferencies
 
