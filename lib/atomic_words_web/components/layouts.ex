@@ -139,13 +139,7 @@ defmodule AtomicWordsWeb.Layouts do
 
       <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 absolute top-full left-1/2 -translate-x-1/2 mt-0 w-52 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-50">
         <.link
-          navigate={~p"/users/settings"}
-          class="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <.icon name="hero-cog-6-tooth" class="w-4 h-4" /> Settings
-        </.link>
-        <.link
-          navigate={~p"/users/settings/account"}
+          navigate={~p"/account"}
           class="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <.icon name="hero-user" class="w-4 h-4" /> Account
@@ -205,17 +199,9 @@ defmodule AtomicWordsWeb.Layouts do
         class={
             "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :settings, do: "bg-gray-200", else: "hover:bg-gray-50"}"
           }
-        navigate={~p"/users/settings"}
+        navigate={~p"/settings"}
       >
         <.icon name="hero-cog-6-tooth" class="size-4 inline-block mr-2" /> Settings
-      </.link>
-      <.link
-        class={
-            "text-gray-700 hover:text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md #{if @active_tab == :logout, do: "bg-gray-200", else: "hover:bg-gray-50"}"
-          }
-        href={~p"/users/log-out"}
-      >
-        <.icon name="hero-arrow-left-start-on-rectangle" class="size-4 inline-block mr-2" /> Log out
       </.link>
     </div>
     """
