@@ -4,11 +4,11 @@ defmodule AtomicWordsWeb.AccountLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <Layouts.page
+    <Layouts.app
       flash={@flash}
       current_scope={@current_scope}
-      page_name="Account"
-      back_path={~p"/"}
+      active_tab={:account}
+      active_session={@active_session}
     >
       <div class="mx-auto flex max-w-3xl flex-col gap-6 px-6 py-8">
         <div class="space-y-2">
@@ -27,7 +27,7 @@ defmodule AtomicWordsWeb.AccountLive do
           </.link>
         </div>
       </div>
-    </Layouts.page>
+    </Layouts.app>
     """
   end
 end

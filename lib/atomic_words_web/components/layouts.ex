@@ -109,7 +109,7 @@ defmodule AtomicWordsWeb.Layouts do
           active_tab={@active_tab}
         />
         <div class="flex flex-row items-justify-center">
-          <.profile_info current_user={@current_user} />
+          <.profile_info current_user={@current_user} active_tab={@active_tab} />
         </div>
       </nav>
     </div>
@@ -117,11 +117,16 @@ defmodule AtomicWordsWeb.Layouts do
   end
 
   attr :current_user, :any
+  attr :active_tab, :atom, default: :home
 
   def profile_info(assigns) do
     ~H"""
     <div class="relative flex items-center pr-4 my-4 group">
-      <div class="flex items-center gap-3 px-3 py-2 cursor-default">
+      <div class={[
+        "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+        if(@active_tab == :account, do: "bg-gray-200", else: "group-hover:bg-gray-50"),
+        "cursor-default"
+      ]}>
         <div class="w-9 h-9 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
           <img src="/images/avatar.svg" alt="User Avatar" class="w-9 h-9" />
         </div>
