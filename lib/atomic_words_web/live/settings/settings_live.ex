@@ -1,7 +1,5 @@
-defmodule AtomicWordsWeb.UserLive.Settings do
+defmodule AtomicWordsWeb.SettingsLive do
   use AtomicWordsWeb, :live_view
-
-  on_mount {AtomicWordsWeb.UserAuth, :require_sudo_mode}
 
   alias AtomicWords.Accounts
   alias AtomicWords.Preferencies
@@ -29,12 +27,17 @@ defmodule AtomicWordsWeb.UserLive.Settings do
                 interface_languages={@interface_languages}
                 selected_interface_lang={@selected_interface_lang}
               />
-            <% :account -> %>
-              <.account_settings />
             <% :training -> %>
-              <.training_settings />
+              <.training_settings
+                training_modes={@training_modes}
+                session_sizes={@session_sizes}
+                default_training_mode={@default_training_mode}
+                default_session_size={@default_session_size}
+                card_orientation_word_first={@card_orientation_word_first}
+                auto_add_random_words={@auto_add_random_words}
+              />
             <% :dictionary -> %>
-              <.dictionary_settings />
+              <.dictionary_settings transcription_variant={@transcription_variant} />
             <% :languages -> %>
               <.language_settings
                 original_lang={@original_lang}
@@ -61,7 +64,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
             else: "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           )
         ]}
-        patch={~p"/users/settings"}
+        patch={~p"/settings"}
       >
         {dgettext("settings", "General")}
       </.link>
@@ -73,7 +76,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
             else: "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           )
         ]}
-        patch={~p"/users/settings/languages"}
+        patch={~p"/settings/languages"}
       >
         {dgettext("settings", "Languages")}
       </.link>
@@ -85,7 +88,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
             else: "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           )
         ]}
-        patch={~p"/users/settings/training"}
+        patch={~p"/settings/training"}
       >
         {dgettext("settings", "Training")}
       </.link>
@@ -97,21 +100,9 @@ defmodule AtomicWordsWeb.UserLive.Settings do
             else: "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           )
         ]}
-        patch={~p"/users/settings/dictionary"}
+        patch={~p"/settings/dictionary"}
       >
         {dgettext("settings", "Dictionary")}
-      </.link>
-      <.link
-        class={[
-          "text-lg font-semibold rounded-lg px-3 py-2",
-          if(@live_action == :account,
-            do: "text-gray-900 dark:text-white",
-            else: "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-          )
-        ]}
-        patch={~p"/users/settings/account"}
-      >
-        {dgettext("settings", "Account")}
       </.link>
     </nav>
     """
@@ -142,7 +133,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           </div>
         </div>
         <.link
-          patch={~p"/users/settings/account"}
+          navigate={~p"/account"}
           class="mt-2 inline-block text-blue-600 hover:none"
         >
           {dgettext("settings", "Manage Account")}
@@ -196,26 +187,171 @@ defmodule AtomicWordsWeb.UserLive.Settings do
     """
   end
 
-  def account_settings(assigns) do
-    ~H"""
-    <div>
-      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Account")}</h2>
-    </div>
-    """
-  end
-
   def training_settings(assigns) do
     ~H"""
-    <div>
-      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Training")}</h2>
+    <div class="max-w-2xl space-y-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {dgettext("settings", "Training")}
+      </h2>
+
+      <%!-- Default Training Mode --%>
+      <div id="training-mode" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Default Training Mode")}
+        </h3>
+        <form phx-change="save_training_mode" id="training-mode-form">
+          <div class="relative w-fit">
+            <select
+              name="default_training_mode"
+              id="training-mode-select"
+              class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <%= for {name, value} <- @training_modes do %>
+                <option value={value} selected={@default_training_mode == value}>{name}</option>
+              <% end %>
+            </select>
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            </span>
+          </div>
+        </form>
+      </div>
+
+      <%!-- Default Session Size --%>
+      <div id="session-size" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Default Session Size")}
+        </h3>
+        <form phx-change="save_session_size" id="session-size-form">
+          <div class="relative w-fit">
+            <select
+              name="default_session_size"
+              id="session-size-select"
+              class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <%= for {name, value} <- @session_sizes do %>
+                <option value={value} selected={@default_session_size == value}>{name}</option>
+              <% end %>
+            </select>
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            </span>
+          </div>
+        </form>
+      </div>
+
+      <%!-- Card Orientation --%>
+      <div id="card-orientation" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Card Orientation")}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          {dgettext("settings", "Choose which side of a flashcard is shown first.")}
+        </p>
+        <button
+          id="card-orientation-toggle"
+          type="button"
+          phx-click="toggle_card_orientation"
+          class="flex items-center gap-3 cursor-pointer w-fit group"
+        >
+          <div class={[
+            "relative w-11 h-6 rounded-full transition-colors",
+            if(@card_orientation_word_first, do: "bg-blue-600", else: "bg-gray-300 dark:bg-gray-600")
+          ]}>
+            <div class={[
+              "absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 shadow transition-transform",
+              if(@card_orientation_word_first, do: "translate-x-5", else: "translate-x-0")
+            ]}>
+            </div>
+          </div>
+          <span class="text-sm font-medium text-gray-700 dark:text-white">
+            <%= if @card_orientation_word_first do %>
+              {dgettext("settings", "Word first")}
+            <% else %>
+              {dgettext("settings", "Translation first")}
+            <% end %>
+          </span>
+        </button>
+      </div>
+
+      <%!-- Auto-add words from random mode --%>
+      <div id="auto-add-random" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Auto-add Random Words")}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          {dgettext(
+            "settings",
+            "Automatically add words practiced in \"Random\" training mode to your dictionary."
+          )}
+        </p>
+        <button
+          id="auto-add-toggle"
+          type="button"
+          phx-click="toggle_auto_add_random_words"
+          class="flex items-center gap-3 cursor-pointer w-fit"
+        >
+          <div class={[
+            "relative w-11 h-6 rounded-full transition-colors",
+            if(@auto_add_random_words, do: "bg-blue-600", else: "bg-gray-300 dark:bg-gray-600")
+          ]}>
+            <div class={[
+              "absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 shadow transition-transform",
+              if(@auto_add_random_words, do: "translate-x-5", else: "translate-x-0")
+            ]}>
+            </div>
+          </div>
+          <span class="text-sm font-medium text-gray-700 dark:text-white">
+            <%= if @auto_add_random_words do %>
+              {dgettext("settings", "Enabled")}
+            <% else %>
+              {dgettext("settings", "Disabled")}
+            <% end %>
+          </span>
+        </button>
+      </div>
     </div>
     """
   end
 
   def dictionary_settings(assigns) do
     ~H"""
-    <div>
-      <h2 class="text-2xl font-bold mb-4">{dgettext("settings", "Dictionary")}</h2>
+    <div class="max-w-2xl space-y-8">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {dgettext("settings", "Dictionary")}
+      </h2>
+
+      <%!-- Transcription Variant --%>
+      <div id="transcription-variant" class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-1">
+          {dgettext("settings", "Transcription Variant")}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+          {dgettext("settings", "Choose which phonetic transcription style to display.")}
+        </p>
+        <form phx-change="save_transcription_variant" id="transcription-variant-form">
+          <div class="relative w-fit">
+            <select
+              name="transcription_variant"
+              id="transcription-variant-select"
+              class="appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white pl-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="us" selected={@transcription_variant == "us"}>
+                {dgettext("settings", "US English")}
+              </option>
+              <option value="uk" selected={@transcription_variant == "uk"}>
+                {dgettext("settings", "UK English")}
+              </option>
+              <option value="both" selected={@transcription_variant == "both"}>
+                {dgettext("settings", "Both")}
+              </option>
+            </select>
+            <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400 dark:text-gray-500">
+              <.icon name="hero-chevron-down" class="w-4 h-4" />
+            </span>
+          </div>
+        </form>
+      </div>
     </div>
     """
   end
@@ -312,7 +448,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           put_flash(socket, :error, "Email change link is invalid or it has expired.")
       end
 
-    {:ok, push_navigate(socket, to: ~p"/users/settings")}
+    {:ok, push_navigate(socket, to: ~p"/settings")}
   end
 
   def mount(_params, _session, socket) do
@@ -336,6 +472,13 @@ defmodule AtomicWordsWeb.UserLive.Settings do
       |> assign(:selected_target_lang, nil)
       |> assign(:interface_languages, [{"English", "en"}, {"Українська", "uk"}])
       |> assign(:selected_interface_lang, interface_lang)
+      |> assign(:training_modes, AtomicWords.Constants.training_modes())
+      |> assign(:session_sizes, AtomicWords.Constants.session_sizes())
+      |> assign(:default_training_mode, "my_words")
+      |> assign(:default_session_size, 15)
+      |> assign(:card_orientation_word_first, true)
+      |> assign(:auto_add_random_words, false)
+      |> assign(:transcription_variant, "us")
 
     {:ok, socket}
   end
@@ -363,7 +506,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
         Accounts.deliver_user_update_email_instructions(
           Ecto.Changeset.apply_action!(changeset, :insert),
           user.email,
-          &url(~p"/users/settings/confirm-email/#{&1}")
+          &url(~p"/settings/confirm-email/#{&1}")
         )
 
         info = "A link to confirm your email change has been sent to the new address."
@@ -482,7 +625,7 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
     case Preferencies.update_interface_lang(user_id, lang) do
       {:ok, _} ->
-        {:noreply, push_navigate(socket, to: ~p"/users/settings")}
+        {:noreply, push_navigate(socket, to: ~p"/settings")}
 
       {:error, _} ->
         {:noreply,
@@ -492,15 +635,63 @@ defmodule AtomicWordsWeb.UserLive.Settings do
 
   def handle_event("save_interface_language", _params, socket), do: {:noreply, socket}
 
+  def handle_event("save_training_mode", %{"default_training_mode" => mode}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    case Preferencies.update_default_training_mode(user_id, mode) do
+      {:ok, _} -> {:noreply, assign(socket, :default_training_mode, mode)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Could not save training mode.")}
+    end
+  end
+
+  def handle_event("save_session_size", %{"default_session_size" => size}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    size = String.to_integer(size)
+
+    case Preferencies.update_default_session_size(user_id, size) do
+      {:ok, _} -> {:noreply, assign(socket, :default_session_size, size)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Could not save session size.")}
+    end
+  end
+
+  def handle_event("toggle_card_orientation", _params, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    new_value = !socket.assigns.card_orientation_word_first
+
+    case Preferencies.update_card_orientation(user_id, new_value) do
+      {:ok, _} -> {:noreply, assign(socket, :card_orientation_word_first, new_value)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Could not save card orientation.")}
+    end
+  end
+
+  def handle_event("toggle_auto_add_random_words", _params, socket) do
+    user_id = socket.assigns.current_scope.user.id
+    new_value = !socket.assigns.auto_add_random_words
+
+    case Preferencies.update_auto_add_random_words(user_id, new_value) do
+      {:ok, _} -> {:noreply, assign(socket, :auto_add_random_words, new_value)}
+      {:error, _} -> {:noreply, put_flash(socket, :error, "Could not save auto-add setting.")}
+    end
+  end
+
+  def handle_event("save_transcription_variant", %{"transcription_variant" => variant}, socket) do
+    user_id = socket.assigns.current_scope.user.id
+
+    case Preferencies.update_transcription_variant(user_id, variant) do
+      {:ok, _} ->
+        {:noreply, assign(socket, :transcription_variant, variant)}
+
+      {:error, _} ->
+        {:noreply, put_flash(socket, :error, "Could not save transcription variant.")}
+    end
+  end
+
   @impl true
   def handle_params(_params, _uri, socket) do
     live_action = socket.assigns.live_action
 
     socket =
       case live_action do
-        :account ->
-          socket
-
         :languages ->
           user_id = socket.assigns.current_scope.user.id
 
@@ -515,10 +706,22 @@ defmodule AtomicWordsWeb.UserLive.Settings do
           |> assign(:selected_target_lang, Preferencies.selected_target_lang(user_id))
 
         :training ->
+          user_id = socket.assigns.current_scope.user.id
+
           socket
+          |> assign(:default_training_mode, Preferencies.default_training_mode(user_id))
+          |> assign(:default_session_size, Preferencies.default_session_size(user_id))
+          |> assign(
+            :card_orientation_word_first,
+            Preferencies.card_orientation_word_first(user_id)
+          )
+          |> assign(:auto_add_random_words, Preferencies.auto_add_random_words(user_id))
 
         :dictionary ->
+          user_id = socket.assigns.current_scope.user.id
+
           socket
+          |> assign(:transcription_variant, Preferencies.transcription_variant(user_id))
 
         _ ->
           socket

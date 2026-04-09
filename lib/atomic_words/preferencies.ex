@@ -1,5 +1,6 @@
 defmodule AtomicWords.Preferencies do
   import Ecto.Query
+  alias AtomicWords.Constants
   alias AtomicWords.Repo
   alias AtomicWords.Accounts.UserPreferencies
 
@@ -155,6 +156,173 @@ defmodule AtomicWords.Preferencies do
         |> UserPreferencies.interface_lang_changeset(%{interface_lang: lang}, %{
           user: %{id: user_id}
         })
+        |> Repo.update()
+    end
+  end
+
+  def default_training_mode(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.default_training_mode
+
+    Repo.one(query) || Constants.training_modes() |> List.first() |> elem(1)
+  end
+
+  def update_default_training_mode(user_id, mode) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.default_training_mode_changeset(%{default_training_mode: mode}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.default_training_mode_changeset(%{default_training_mode: mode}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.update()
+    end
+  end
+
+  def default_session_size(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.default_session_size
+
+    Repo.one(query) || Constants.session_sizes() |> List.first() |> elem(1)
+  end
+
+  def update_default_session_size(user_id, size) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.default_session_size_changeset(%{default_session_size: size}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.default_session_size_changeset(%{default_session_size: size}, %{
+          user: %{id: user_id}
+        })
+        |> Repo.update()
+    end
+  end
+
+  def card_orientation_word_first(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.card_orientation_word_first
+
+    case Repo.one(query) do
+      nil -> true
+      value -> value
+    end
+  end
+
+  def update_card_orientation(user_id, word_first) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.card_orientation_changeset(
+          %{card_orientation_word_first: word_first},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.card_orientation_changeset(
+          %{card_orientation_word_first: word_first},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.update()
+    end
+  end
+
+  def auto_add_random_words(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.auto_add_random_words
+
+    case Repo.one(query) do
+      nil -> false
+      value -> value
+    end
+  end
+
+  def update_auto_add_random_words(user_id, enabled) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.auto_add_random_words_changeset(
+          %{auto_add_random_words: enabled},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.auto_add_random_words_changeset(
+          %{auto_add_random_words: enabled},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.update()
+    end
+  end
+
+  def transcription_variant(user_id) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id,
+        select: up.transcription_variant
+
+    Repo.one(query) || "us"
+  end
+
+  def update_transcription_variant(user_id, variant) do
+    query =
+      from up in UserPreferencies,
+        where: up.user_id == ^user_id
+
+    case Repo.one(query) do
+      nil ->
+        %UserPreferencies{}
+        |> UserPreferencies.transcription_variant_changeset(
+          %{transcription_variant: variant},
+          %{user: %{id: user_id}}
+        )
+        |> Repo.insert()
+
+      preferencies ->
+        preferencies
+        |> UserPreferencies.transcription_variant_changeset(
+          %{transcription_variant: variant},
+          %{user: %{id: user_id}}
+        )
         |> Repo.update()
     end
   end
