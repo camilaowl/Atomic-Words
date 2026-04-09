@@ -37,3 +37,48 @@ msgstr "Native Language"
 
 msgid "Target language"
 msgstr "Target language"
+
+msgid "Default Training Mode"
+msgstr "Default Training Mode"
+
+msgid "Default Session Size"
+msgstr "Default Session Size"
+
+msgid "Card Orientation"
+msgstr "Card Orientation"
+
+msgid "Choose which side of a flashcard is shown first."
+msgstr "Choose which side of a flashcard is shown first."
+
+msgid "Word first"
+msgstr "Word first"
+
+msgid "Translation first"
+msgstr "Translation first"
+
+msgid "Auto-add Random Words"
+msgstr "Auto-add Random Words"
+
+msgid "Automatically add words practiced in \"Random\" training mode to your dictionary."
+msgstr "Automatically add words practiced in \"Random\" training mode to your dictionary."
+
+msgid "Enabled"
+msgstr "Enabled"
+
+msgid "Disabled"
+msgstr "Disabled"
+
+msgid "Transcription Variant"
+msgstr "Transcription Variant"
+
+msgid "Choose which phonetic transcription style to display."
+msgstr "Choose which phonetic transcription style to display."
+
+msgid "US English"
+msgstr "US English"
+
+msgid "UK English"
+msgstr "UK English"
+
+msgid "Both"
+msgstr "Both"

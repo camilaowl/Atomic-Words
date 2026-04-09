@@ -32,5 +32,19 @@ defmodule AtomicWords.Constants do
     {"Vietnamese", "vi"}
   ]
 
+  @training_modes [
+    {"My words", "my_words"},
+    {"Difficult", "difficult"},
+    {"Random words", "random"}
+  ]
+
+  @session_sizes [
+    {"15 words", 15},
+    {"30 words", 30},
+    {"45 words", 45}
+  ]
+
   def native_languages, do: @languages
+  def training_modes, do: @training_modes
+  def session_sizes, do: @session_sizes
 end
