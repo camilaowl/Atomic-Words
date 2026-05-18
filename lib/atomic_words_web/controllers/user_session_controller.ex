@@ -65,15 +65,31 @@ defmodule AtomicWordsWeb.UserSessionController do
 
   def update_password(conn, %{"user" => user_params} = params) do
     user = conn.assigns.current_scope.user
-    true = Accounts.sudo_mode?(user)
-    {:ok, {_user, expired_tokens}} = Accounts.update_user_password(user, user_params)
+    current_password = Map.get(user_params, "current_password", "")
+    password_attrs = Map.drop(user_params, ["current_password"])
 
-    # disconnect all existing LiveViews with old sessions
-    UserAuth.disconnect_sessions(expired_tokens)
+    cond do
+      not Accounts.valid_user_password?(user, current_password) ->
+        conn
+        |> put_flash(:error, "Current password is incorrect.")
+        |> redirect(to: ~p"/account/password")
 
-    conn
-    |> put_session(:user_return_to, ~p"/settings")
-    |> create(params, "Password updated successfully!")
+      true ->
+        case Accounts.update_user_password(user, password_attrs) do
+          {:ok, {updated_user, expired_tokens}} ->
+            UserAuth.disconnect_sessions(expired_tokens)
+
+            conn
+            |> put_flash(:info, "Password updated successfully!")
+            |> put_session(:user_return_to, ~p"/account")
+            |> UserAuth.log_in_user(updated_user, params)
+
+          {:error, _changeset} ->
+            conn
+            |> put_flash(:error, "Could not update password.")
+            |> redirect(to: ~p"/account/password")
+        end
+    end
   end
 
   def delete(conn, _params) do
