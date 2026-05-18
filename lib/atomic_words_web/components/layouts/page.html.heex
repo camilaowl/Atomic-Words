@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-white dark:bg-slate-950">
   <div class="mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-6 sm:px-6 lg:px-8">
-    <header class="mb-6 flex items-center gap-3 bg-blue-300">
+    <header class="mb-6 flex items-center gap-3">
       <a
         href={assigns[:back_path] || "/"}
         onclick={
@@ -11,15 +11,12 @@
             "return true;" <>
           "}"
         }
-        class="inline-flex h-10 w-10 items-center justify-center text-slate-700 transition hover:-translate-x-0.5 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+        class="inline-flex items-center gap-2 text-sm font-large text-slate-700 transition hover:-translate-x-0.5 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
         aria-label="Go back"
       >
         <.icon name="hero-arrow-left" class="size-5" />
+        <span>Back</span>
       </a>
-
-      <h1 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-        {@page_name}
-      </h1>
     </header>
 
     <main class="flex-1">

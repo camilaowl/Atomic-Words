@@ -55,13 +55,18 @@ defmodule AtomicWordsWeb.Router do
   scope "/", AtomicWordsWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    put "/account/password", UserSessionController, :update_password
+
     live_session :require_authenticated_user,
       on_mount: [{AtomicWordsWeb.UserAuth, :require_authenticated}] do
       live "/settings", SettingsLive, :general
       live "/settings/languages", SettingsLive, :languages
       live "/settings/training", SettingsLive, :training
       live "/settings/dictionary", SettingsLive, :dictionary
-      live "/account", AccountLive
+      live "/account", AccountLive, :index
+      live "/account/email", AccountEmailLive, :edit
+      live "/account/email/confirm/:token", AccountEmailLive, :confirm
+      live "/account/password", AccountPasswordLive, :edit
       live "/", HomeLive
       live "/training", TrainingLive
       live "/training_mode", TrainingModeLive

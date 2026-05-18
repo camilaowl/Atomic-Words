@@ -45,6 +45,13 @@ defmodule AtomicWords.Accounts do
   end
 
   @doc """
+  Verifies the given password against the user.
+  """
+  def valid_user_password?(user, password) do
+    User.valid_password?(user, password)
+  end
+
+  @doc """
   Gets a single user.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
@@ -112,11 +119,34 @@ defmodule AtomicWords.Accounts do
   end
 
   @doc """
-  Updates the user email using the given token.
-
-  If the token matches, the user email is updated and the token is deleted.
+  Returns an `%Ecto.Changeset{}` for changing the user nickname.
   """
-  def update_user_email(user, token) do
+  def change_user_nickname(user, attrs \\ %{}) do
+    User.nickname_changeset(user, attrs)
+  end
+
+  @doc """
+  Updates the user nickname.
+  """
+  def update_user_nickname(user, attrs) do
+    user
+    |> User.nickname_changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Updates the user email.
+
+  - When `attrs` is a map, updates the email immediately.
+  - When `attrs` is a token string, updates the email from the token payload and deletes the token.
+  """
+  def update_user_email(user, attrs) when is_map(attrs) do
+    user
+    |> User.email_changeset(attrs)
+    |> Repo.update()
+  end
+
+  def update_user_email(user, token) when is_binary(token) do
     context = "change:#{user.email}"
 
     Repo.transact(fn ->
